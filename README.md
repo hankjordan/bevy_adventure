@@ -14,7 +14,7 @@ A framework for building 3d adventure games in Bevy.
 
 ## Examples
 
-![Preview](https://raw.githubusercontent.com/hankjordan/bevy_adventure/master/examples/preview.mp4)
+[![][img_preview]][preview]
 
 There is an elaborate example available at `examples/main.rs`.
 Three scenes are included, with multiple objects that can be interacted with or picked up.
@@ -68,8 +68,12 @@ NOTE: We do not track Bevy main.
 [img_downloads]:https://img.shields.io/crates/d/bevy_adventure.svg
 [img_tracking]: https://img.shields.io/badge/Bevy%20tracking-released%20version-lightblue
 
+[img_preview]: https://raw.githubusercontent.com/hankjordan/bevy_adventure/master/examples/preview.mp4
+
 [bevy]: https://crates.io/crates/bevy/0.9.1
 [crates]: https://crates.io/crates/bevy_adventure
 [doc]: https://docs.rs/bevy_adventure/
 [license]: https://github.com/hankjordan/bevy_adventure#license
 [tracking]: https://github.com/bevyengine/bevy/blob/main/docs/plugins_guidelines.md#main-branch-tracking
+
+[preview]: https://github.com/hankjordan/bevy_adventure/examples
