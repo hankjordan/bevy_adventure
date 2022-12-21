@@ -1,4 +1,4 @@
-# Bevy_adventure
+# Bevy_adventure [![][img_crates]][crates] [![][img_doc]][doc]
 
 A framework for building 3d adventure games in Bevy.
 
@@ -43,3 +43,9 @@ The `Interactive` trait only allows you to return a single `Action` when an obje
 - Documentation
 - Examples
 - Gamepad support
+
+[img_crates]: https://img.shields.io/crates/v/bevy_adventure.svg
+[img_doc]: https://img.shields.io/badge/rust-documentation-blue.svg
+
+[crates]: https://crates.io/crates/bevy_adventure
+[doc]: https://docs.rs/bevy_adventure/
