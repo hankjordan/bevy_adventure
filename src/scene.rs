@@ -18,10 +18,13 @@ use crate::{
         AnimationServer,
         Tween,
     },
-    camera::IsCameraSpot,
+    camera::{
+        CameraSpot,
+        IsCameraSpot,
+    },
     interactives::interactive,
+    CurrentSpot,
     Interactive,
-    NextSpot,
     MAIN_CAMERA,
 };
 
@@ -107,7 +110,11 @@ impl<'w, 's> SceneManager<'w, 's> {
                         if name.as_str() == MAIN_CAMERA {
                             let tf = entity.get::<Transform>().unwrap();
 
-                            commands.commands().insert_resource(NextSpot::new(name));
+                            let spot = CameraSpot::new(name, entity.id(), *tf);
+                            
+                            commands
+                                .commands()
+                                .insert_resource(CurrentSpot::new(spot));
 
                             commands
                                 .commands()
