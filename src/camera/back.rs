@@ -1,5 +1,8 @@
 use bevy::prelude::*;
 
+/// A component for a `CameraSpot` that defines what spot you will go back when at that spot.
+///
+/// Overrides `BackToState`.
 #[derive(Component, Debug)]
 pub struct BackToSpot {
     pub spot: String,
@@ -13,6 +16,7 @@ impl BackToSpot {
     }
 }
 
+/// A component for a `CameraSpot` that defines what state you will go back when at that spot.
 #[derive(Component, Debug)]
 pub struct BackToState<T> {
     pub state: T,

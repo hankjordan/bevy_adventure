@@ -11,6 +11,7 @@ use crate::{
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct NoState;
 
+/// A preset Interactive that displays a message when interacted with.
 #[derive(Component)]
 pub struct Description {
     text: String,
@@ -32,6 +33,7 @@ impl Interactive for Description {
     }
 }
 
+/// A preset Interactive that moves to a `CameraSpot` when interacted with.
 #[derive(Component)]
 pub struct MoveTo {
     spot: String,
@@ -53,6 +55,7 @@ impl Interactive for MoveTo {
     }
 }
 
+/// A preset Interactive that changes the current state when interacted with.
 #[derive(Component)]
 pub struct Portal<T> {
     state: T,

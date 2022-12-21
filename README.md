@@ -33,10 +33,6 @@ The component should only hold temporary state information - like which drawer i
 
 If you want to store any other kind of information, it should be done in the `WorldState` resource. This is so other interactives in your scene can access this state (for example, you'd flip a switch and the lights would go out) and so you are storing state information in a single place.
 
-### Triggering multiple actions
-
-The `Interactive` trait only allows you to return a single `Action` when an object is interacted with. This is done for ergonomics,
-
 ## TODO
 
 - Audio

@@ -3,12 +3,14 @@ use bevy::{
     prelude::*,
 };
 
-#[derive(Component)]
+#[derive(Component, Debug)]
 pub struct IsCameraSpot;
 
-#[derive(Component)]
+/// A component for a Camera that specifies what `CameraSpot` it is at.
+#[derive(Component, Debug)]
 pub struct AtSpot(pub Entity);
 
+#[derive(Debug)]
 pub struct CameraSpot {
     pub entity: Entity,
     pub transform: Transform,

@@ -25,6 +25,7 @@ impl<T> Tween<T> {
     }
 }
 
+#[allow(clippy::needless_pass_by_value)]
 fn tween_transforms(time: Res<Time>, mut targets: Query<(&Tween<Transform>, &mut Transform)>) {
     let dt = time.delta_seconds();
 
@@ -40,6 +41,8 @@ pub struct AnimationServer {
 }
 
 impl AnimationServer {
+    // TODO: Add animations to example
+    #[allow(dead_code)]
     pub fn load(&mut self, asset_server: &Res<AssetServer>, scene: &str, name: &str) {
         self.map.insert(
             name.to_owned(),

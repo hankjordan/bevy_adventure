@@ -43,6 +43,7 @@ pub struct InteractiveQuery<'w, 's, T: Interactive + Component + 'static> {
 }
 
 #[allow(clippy::too_many_arguments)]
+#[allow(clippy::needless_pass_by_value)]
 pub fn interactive<T: Interactive + Component>(
     mut commands: CommandsExt,
     mut display: TextDisplay,
@@ -141,7 +142,6 @@ pub fn interactive<T: Interactive + Component>(
                 } else if let Ok(back) = query.back_state.get(at_spot.0) {
                     commands.insert_resource(NextState(back.state.clone()));
                 } else if let Some(spot) = spots.get("Camera_Main") {
-                    // TODO
                     next_spot.set(spot);
                 }
             }

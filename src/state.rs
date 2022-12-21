@@ -10,6 +10,15 @@ use serde::{
     Serialize,
 };
 
+pub struct WorldStatePlugin;
+
+impl Plugin for WorldStatePlugin {
+    fn build(&self, app: &mut App) {
+        app ////
+            .insert_resource(WorldState::default());
+    }
+}
+
 /// Stringly-typed key value store for tracking game progression.
 /// 
 /// Use it when you want to persist state for interactives (or anything else that needs to work with interactives).
@@ -30,11 +39,11 @@ impl WorldState {
         self.get(key).unwrap_or_default()
     }
 
-    pub fn insert<T: ToString>(&mut self, key: &str, value: T) {
+    pub fn insert<T: ToString>(&mut self, key: &str, value: &T) {
         self.map.insert(key.to_owned(), value.to_string());
     }
 
-    pub fn set<T: ToString>(&mut self, key: &str, value: T) {
+    pub fn set<T: ToString>(&mut self, key: &str, value: &T) {
         self.insert(key, value);
     }
 }

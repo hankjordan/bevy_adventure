@@ -4,17 +4,15 @@ use std::collections::{
 };
 
 use bevy::prelude::*;
+#[cfg(feature = "serde")]
 use serde::{
     Deserialize,
     Serialize,
 };
 
-use crate::{
-    interactives::invalid_combine,
-    textdisplay::{
-        Message,
-        TextDisplay,
-    },
+use crate::textdisplay::{
+    Message,
+    TextDisplay,
 };
 
 pub struct InventoryPlugin;
@@ -26,18 +24,19 @@ impl Plugin for InventoryPlugin {
             .insert_resource(DraggingItem::default())
             .insert_resource(Inventory::default())
             .insert_resource(Recipes::default())
-
-            .add_startup_system(setup_recipes)
             
             .add_system(handle_combine);
     }
 }
 
-#[derive(Resource, Debug, Default, Serialize, Deserialize)]
+/// A resource that stores the player's current inventory.
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[derive(Resource, Debug, Default)]
 pub struct Inventory {
     pub items: HashSet<String>,
 }
 
+/// A newly created item, with an optional message to show when picking it up.
 #[derive(Clone, Debug)]
 pub struct AddedItem {
     pub name: String,
@@ -52,12 +51,14 @@ impl AddedItem {
         }
     }
 
+    #[must_use]
     pub fn with_message(mut self, message: &str) -> Self {
         self.message = Some(message.to_owned());
         self
     }
 }
 
+/// A resource that stores which items are being dragged, if any.
 #[derive(Resource, Default)]
 pub struct DraggingItem {
     pub src: Option<String>,
@@ -70,12 +71,15 @@ impl DraggingItem {
     }
 }
 
+/// A resource that stores all registered item combinations.
 #[derive(Resource, Default)]
 pub struct Recipes {
     map: HashMap<(String, String), String>,
 }
 
 impl Recipes {
+    /// Insert a new recipe into the map.
+    /// Order is ignored (`(a, b) == (b, a)`).
     pub fn insert(&mut self, a: &str, b: &str, result: &str) {
         self.map
             .insert((a.to_owned(), b.to_owned()), result.to_owned());
@@ -88,10 +92,7 @@ impl Recipes {
     }
 }
 
-fn setup_recipes(mut recipes: ResMut<Recipes>) {
-    recipes.insert("Flashlight (empty)", "Batteries", "Flashlight");
-}
-
+#[allow(clippy::needless_pass_by_value)]
 fn handle_combine(
     input: Res<Input<MouseButton>>,
     mut display: TextDisplay,
@@ -107,11 +108,13 @@ fn handle_combine(
 
                 inventory.items.insert(result.clone());
 
-                display.show(Message::new(&format!(
-                    "You combine the items to create {result}."
-                )));
+                let src = src.clone();
+                let dst = dst.clone();
+                let result = result.clone();
+
+                display.show(Message::ItemCombine { src, dst, result });
             } else {
-                display.show(invalid_combine());
+                display.show(Message::InvalidItemCombination);
             }
         }
     }

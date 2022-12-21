@@ -1,13 +1,26 @@
 use std::marker::PhantomData;
 
-use bevy::{prelude::*, ecs::schedule::StateData};
+use bevy::{
+    ecs::schedule::StateData,
+    prelude::*,
+};
 
 use crate::interactives::{
     interactive,
-    simple::*,
+    simple::{
+        Description,
+        MoveTo,
+        Portal,
+    },
 };
 
 pub struct InteractivesPlugin<S>(PhantomData<S>);
+
+impl<S> Default for InteractivesPlugin<S> {
+    fn default() -> Self {
+        Self(PhantomData::default())
+    }
+}
 
 #[rustfmt::skip]
 impl<S> Plugin for InteractivesPlugin<S> 
