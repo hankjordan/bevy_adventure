@@ -3,6 +3,8 @@
 
 A framework for building 3d adventure games in Bevy.
 
+https://user-images.githubusercontent.com/29737477/209001156-8c4916dd-327c-4e4f-aa22-9c2676a8134d.mp4
+
 ## Features
 
 - `Interactive` trait is the backbone of the framework, allowing you to create powerful, dynamic objects in your world that can be interacted with and can affect other objects or global state.
@@ -13,8 +15,6 @@ A framework for building 3d adventure games in Bevy.
 - Support for multiple scenes (built on top of `iyes_loopless`)
 
 ## Examples
-
-https://user-images.githubusercontent.com/29737477/209001156-8c4916dd-327c-4e4f-aa22-9c2676a8134d.mp4
 
 There is an elaborate example available at `examples/main.rs`.
 Three scenes are included, with multiple objects that can be interacted with or picked up.
