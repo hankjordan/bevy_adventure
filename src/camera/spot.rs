@@ -47,10 +47,6 @@ impl CurrentSpot {
     pub fn is_some(&self) -> bool {
         self.spot.is_some()
     }
-
-    pub(crate) fn set(&mut self, spot: CameraSpot) {
-        self.spot = Some(spot);
-    }
 }
 
 /// A `CameraSpot` - a location the Camera might be at in the scene.

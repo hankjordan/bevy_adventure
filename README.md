@@ -19,8 +19,8 @@ A framework for building 3d adventure games in Bevy.
 
 If you want to implement this, here is what you need to keep track of:
 - `CurrentSpot` resource, which determines your current camera spot in the scene.
-Save the name of the `CameraSpot` from this resource and when loading use the name
-to lookup the `CameraSpot` from the `CameraSpots` `SystemParam`.
+When saving, save the name of the `CameraSpot` from this resource.
+When loading, create a new `NextSpot` instance from the loaded name, and insert it with `Commands`.
 - `CurrentState<State>` resource, (from `iyes_loopless`) which determines what scene is currently loaded
 - `Inventory` resource, which tracks what items the player is holding
 - `WorldState` resource, the global game state storage

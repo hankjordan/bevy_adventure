@@ -1,6 +1,11 @@
 use bevy::prelude::*;
 
-use crate::{animation::Tween, camera::spot::{CurrentSpot, CameraSpot}};
+use crate::{
+    animation::Tween,
+    camera::spot::CurrentSpot,
+    scene::SceneManager,
+    CameraSpots,
+};
 
 pub struct NextPlugin;
 
@@ -15,34 +20,76 @@ impl Plugin for NextPlugin {
 
 /// Resource for setting the next spot the Camera will go to.
 #[derive(Resource, Default)]
-pub struct NextSpot(pub Option<CameraSpot>);
+pub struct NextSpot {
+    name: Option<String>,
+    entity: Option<Entity>,
+    jump: bool,
+}
 
 impl NextSpot {
-    /// Returns the current next spot if any, leaving the resource with None.
-    pub fn pop(&mut self) -> Option<CameraSpot> {
-        self.0.take()
+    /// Create a new instance of `NextSpot`, which will skip animating the camera when applied.
+    ///
+    /// If you want a smooth animation, modify the `NextSpot` resource directly instead of inserting a new one.
+    pub fn new(name: &str) -> Self {
+        Self {
+            name: Some(name.to_owned()),
+            entity: None,
+            jump: true,
+        }
     }
 
-    /// Set the `NextSpot` to the given `CameraSpot`.
-    pub fn set(&mut self, spot: CameraSpot) {
-        self.0 = Some(spot);
+    /// Returns the next spot if any, leaving the resource with None.
+    pub fn pop(&mut self) -> (Option<String>, Option<Entity>, bool) {
+        let jump = self.jump;
+        self.jump = false;
+
+        (self.name.take(), self.entity.take(), jump)
+    }
+
+    /// Set the `NextSpot` to the given name.
+    pub fn set(&mut self, name: &str) {
+        self.name = Some(name.to_owned());
+    }
+
+    /// Set an entity override for the `NextSpot`.
+    pub fn set_entity(&mut self, entity: Entity) {
+        self.entity = Some(entity);
     }
 
     /// Returns true if `NextSpot` is None.
     pub fn is_none(&self) -> bool {
-        self.0.is_none()
+        self.name.is_none()
     }
 }
 
+#[allow(clippy::needless_pass_by_value)]
 fn handle_next_spot(
-    mut at_spot: ResMut<CurrentSpot>,
+    mut commands: Commands,
+    scene: SceneManager,
+    spots: CameraSpots,
     mut next_spot: ResMut<NextSpot>,
-    mut cameras: Query<&mut Tween<Transform>, With<Camera>>,
+    mut cameras: Query<(&mut Transform, &mut Tween<Transform>), With<Camera>>,
 ) {
-    if let Some(spot) = next_spot.pop() {
-        if let Ok(mut animation) = cameras.get_single_mut() {
-            animation.target = spot.transform();
-            at_spot.set(spot);
+    if !scene.ready() {
+        return;
+    }
+
+    if let (Some(name), entity_opt, jump) = next_spot.pop() {
+        if let Some(mut spot) = spots.get(&name) {
+            if let Some(entity) = entity_opt {
+                spot.set_entity(entity);
+            }
+
+            if let Ok((mut tf, mut animation)) = cameras.get_single_mut() {
+                if jump {
+                    *tf = spot.transform();
+                }
+
+                animation.target = spot.transform();
+                commands.insert_resource(CurrentSpot::new(spot));
+            }
+        } else {
+            warn!("Could not find camera spot with name {:?}", name);
         }
     }
 }

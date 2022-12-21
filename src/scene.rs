@@ -18,13 +18,10 @@ use crate::{
         AnimationServer,
         Tween,
     },
-    camera::{
-        CameraSpot,
-        IsCameraSpot,
-    },
+    camera::IsCameraSpot,
     interactives::interactive,
-    CurrentSpot,
     Interactive,
+    NextSpot,
     MAIN_CAMERA,
 };
 
@@ -78,9 +75,14 @@ pub struct SceneManager<'w, 's> {
     commands: Commands<'w, 's>,
     asset_server: Res<'w, AssetServer>,
     cameras: Query<'w, 's, Entity, With<Camera>>,
+    unloaded: Query<'w, 's, Entity, (With<SceneHook>, Without<SceneHooked>)>,
 }
 
 impl<'w, 's> SceneManager<'w, 's> {
+    pub fn ready(&self) -> bool {
+        self.unloaded.is_empty()
+    }
+
     pub fn load<'a, P, F>(&mut self, path: P, hook: F) -> impl Bundle
     where
         P: Into<AssetPath<'a>>,
@@ -105,11 +107,7 @@ impl<'w, 's> SceneManager<'w, 's> {
                         if name.as_str() == MAIN_CAMERA {
                             let tf = entity.get::<Transform>().unwrap();
 
-                            let spot = CameraSpot::new(name, entity.id(), *tf);
-                            
-                            commands
-                                .commands()
-                                .insert_resource(CurrentSpot::new(spot));
+                            commands.commands().insert_resource(NextSpot::new(name));
 
                             commands
                                 .commands()

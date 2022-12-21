@@ -9,13 +9,14 @@ use iyes_loopless::state::NextState;
 use crate::{
     animation::AnimationRegistry,
     camera::{
-        CurrentSpot,
         BackToSpot,
         BackToState,
         CameraSpots,
+        CurrentSpot,
         Ignores,
         NextSpot,
     },
+    commands::CommandsExt,
     interactives::{
         Action,
         Interactive,
@@ -25,9 +26,12 @@ use crate::{
         DraggingItem,
         Inventory,
     },
-    commands::CommandsExt,
     state::WorldState,
-    textdisplay::{TextDisplay, Message}, MAIN_CAMERA,
+    textdisplay::{
+        Message,
+        TextDisplay,
+    },
+    MAIN_CAMERA,
 };
 
 type CameraQuery = (&'static Camera, &'static GlobalTransform);
@@ -85,9 +89,9 @@ pub fn interactive<T: Interactive + Component>(
                 ) {
                     if let Ok(mut interactive) = query.interactives.get_mut(entity) {
                         if at_spot.get().entity() != entity {
-                            if let Some(mut spot) = spots.for_interactive(entity) {
-                                spot.set_entity(entity);
-                                next_spot.set(spot);
+                            if let Some(spot) = spots.for_interactive(entity) {
+                                next_spot.set(spot.name());
+                                next_spot.set_entity(entity);
                                 return;
                             }
                         }
@@ -114,29 +118,27 @@ pub fn interactive<T: Interactive + Component>(
                                 }
                                 Action::Animation(animation) => {
                                     for mut player in &mut query.players {
-                                        player.play(animation_server.get(animation.as_str()).unwrap());
+                                        player.play(
+                                            animation_server.get(animation.as_str()).unwrap(),
+                                        );
                                     }
                                 }
                                 Action::Message(text) => display.show(text),
-                                Action::Transition(state) => commands.insert_resource(NextState(state)),
-                                Action::Move(spot) => {
-                                    if let Some(spot) = spots.get(&spot) {
-                                        next_spot.set(spot);
-                                    }
+                                Action::Transition(state) => {
+                                    commands.insert_resource(NextState(state));
                                 }
+                                Action::Move(name) => next_spot.set(&name),
                             }
                         }
                     }
                 }
             } else if !dragging.is_dragging() {
                 if let Ok(back) = query.back_spot.get(at_spot.get().entity()) {
-                    if let Some(spot) = spots.get(&back.name) {
-                        next_spot.set(spot);
-                    }
+                    next_spot.set(&back.name);
                 } else if let Ok(back) = query.back_state.get(at_spot.get().entity()) {
                     commands.insert_resource(NextState(back.state.clone()));
-                } else if let Some(spot) = spots.get(MAIN_CAMERA) {
-                    next_spot.set(spot);
+                } else {
+                    next_spot.set(MAIN_CAMERA);
                 }
             }
         }
