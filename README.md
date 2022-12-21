@@ -14,7 +14,7 @@ A framework for building 3d adventure games in Bevy.
 
 ## Examples
 
-[![][img_preview]][preview]
+https://user-images.githubusercontent.com/29737477/209001156-8c4916dd-327c-4e4f-aa22-9c2676a8134d.mp4
 
 There is an elaborate example available at `examples/main.rs`.
 Three scenes are included, with multiple objects that can be interacted with or picked up.
