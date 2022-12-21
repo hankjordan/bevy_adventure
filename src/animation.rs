@@ -1,6 +1,12 @@
-use std::{collections::HashMap, marker::PhantomData};
+use std::{
+    collections::HashMap,
+    marker::PhantomData,
+};
 
-use bevy::{prelude::*, ecs::system::SystemParam};
+use bevy::{
+    ecs::system::SystemParam,
+    prelude::*,
+};
 
 use crate::Scene;
 
@@ -44,10 +50,7 @@ pub struct AnimationRegistry {
 
 impl AnimationRegistry {
     fn insert(&mut self, name: &str, handle: Handle<AnimationClip>) {
-        self.map.insert(
-            name.to_owned(),
-            handle
-        );
+        self.map.insert(name.to_owned(), handle);
     }
 
     pub fn get(&self, name: &str) -> Option<Handle<AnimationClip>> {

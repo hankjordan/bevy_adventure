@@ -20,7 +20,7 @@ impl Plugin for WorldStatePlugin {
 }
 
 /// Stringly-typed key value store for tracking game progression.
-/// 
+///
 /// Use it when you want to persist state for interactives (or anything else that needs to work with interactives).
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Resource, Debug, Default)]
@@ -30,7 +30,7 @@ pub struct WorldState {
 
 impl WorldState {
     /// Retrieve a value from the map for a given key.
-    /// 
+    ///
     /// The output is parsed from the stored string.
     pub fn get<T: FromStr>(&self, key: &str) -> Option<T> {
         self.map
@@ -39,14 +39,14 @@ impl WorldState {
     }
 
     /// Retrieve a bool value from the map for a given key.
-    /// 
+    ///
     /// Returns false if the key does not exist.
     pub fn get_bool(&self, key: &str) -> bool {
         self.get(key).unwrap_or_default()
     }
 
     /// Insert a value into the map.
-    /// 
+    ///
     /// The value is converted to a string, so it must implement `ToString`.
     #[allow(clippy::needless_pass_by_value)]
     pub fn insert<T: ToString>(&mut self, key: &str, value: T) {

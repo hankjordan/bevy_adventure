@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 
 /// A component for a `CameraSpot` that defines what objects are ignored when at that spot.
-/// 
+///
 /// Useful for creating area triggers.
 #[derive(Component, Default)]
 pub struct Ignores {

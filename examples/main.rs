@@ -59,7 +59,7 @@ impl Scene for BathroomScene {
 
     fn setup(app: &mut App) {
         app ////
-            .register_interactive::<Self, Cup>();
+            .add_interactive::<Self, Cup>();
     }
 
     fn spawn(entity: &EntityRef, commands: &mut EntityCommands) {
@@ -181,8 +181,8 @@ impl Scene for BedroomScene {
 
     fn setup(app: &mut App) {
         app ////
-            .register_interactive::<Self, Dresser>()
-            .register_interactive::<Self, TrashCan>();
+            .add_interactive::<Self, Dresser>()
+            .add_interactive::<Self, TrashCan>();
     }
 
     fn spawn(entity: &EntityRef, commands: &mut EntityCommands) {

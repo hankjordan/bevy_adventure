@@ -1,11 +1,15 @@
-use bevy::{prelude::*, ecs::schedule::StateData};
+use bevy::{
+    ecs::schedule::StateData,
+    prelude::*,
+};
 
 use crate::{
     interactives::{
         Action,
         Interactive,
     },
-    state::WorldState, textdisplay::Message,
+    state::WorldState,
+    textdisplay::Message,
 };
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -70,8 +74,10 @@ impl<T> Portal<T> {
     }
 }
 
-impl<T> Interactive for Portal<T> 
-where T: StateData {
+impl<T> Interactive for Portal<T>
+where
+    T: StateData,
+{
     type State = T;
 
     fn interact(&mut self, _state: &mut ResMut<WorldState>) -> Vec<Action<Self::State>> {

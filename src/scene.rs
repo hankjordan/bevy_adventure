@@ -111,10 +111,8 @@ impl<'w, 's> SceneManager<'w, 's> {
                             let tf = entity.get::<Transform>().unwrap();
 
                             let spot = CameraSpot::new(name, entity.id(), *tf);
-                            
-                            commands
-                                .commands()
-                                .insert_resource(CurrentSpot::new(spot));
+
+                            commands.commands().insert_resource(CurrentSpot::new(spot));
 
                             commands
                                 .commands()
@@ -182,7 +180,7 @@ pub trait AppSceneStateExt {
     fn add_scene<S: Scene + 'static>(&mut self) -> &mut App;
 
     /// Register an interactive for a Scene.
-    fn register_interactive<S, I>(&mut self) -> &mut App
+    fn add_interactive<S, I>(&mut self) -> &mut App
     where
         S: Scene + 'static,
         I: Interactive + Component;
@@ -197,7 +195,7 @@ impl AppSceneStateExt for App {
             .add_exit_system(S::state(), cleanup_scene)
     }
 
-    fn register_interactive<S, I>(&mut self) -> &mut App
+    fn add_interactive<S, I>(&mut self) -> &mut App
     where
         S: Scene + 'static,
         I: Interactive + Component,

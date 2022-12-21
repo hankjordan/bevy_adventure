@@ -1,4 +1,5 @@
-# Bevy_adventure [![][img_crates]][crates] [![][img_doc]][doc]
+# Bevy_adventure 
+[![][img_bevy]][bevy] [![][img_version]][crates] [![][img_doc]][doc] [![][img_license]][license] [![][img_tracking]][tracking] [![][img_downloads]][crates]
 
 A framework for building 3d adventure games in Bevy.
 
@@ -10,6 +11,13 @@ A framework for building 3d adventure games in Bevy.
 - `Inventory` resource allows you to track held items and create recipes for combining them
 - Automatic camera animation and state management, Component-based interface
 - Support for multiple scenes (built on top of `iyes_loopless`)
+
+## Examples
+
+![Preview](examples/preview.mp4)
+
+There is an elaborate example available at `examples/main.rs`.
+Three scenes are included, with multiple objects that can be interacted with or picked up.
 
 ## Notes
 
@@ -38,12 +46,30 @@ If you want to store any other kind of information, it should be done in the `Wo
 ## TODO
 
 - Audio
-- Documentation
-- Examples
+- Save state example
 - Gamepad support
 
-[img_crates]: https://img.shields.io/crates/v/bevy_adventure.svg
-[img_doc]: https://img.shields.io/badge/rust-documentation-blue.svg
+## License
 
+bevy_adventure is dual-licensed under MIT and Apache-2.0.
+
+## Compatibility
+
+NOTE: We do not track Bevy main.
+
+|Bevy Version|Crate Version      |
+|------------|-------------------|
+|`0.9`       |`0.1`              |
+
+[img_bevy]: https://img.shields.io/badge/Bevy-0.9-blue
+[img_version]: https://img.shields.io/crates/v/bevy_adventure.svg
+[img_doc]: https://docs.rs/bevy_adventure/badge.svg
+[img_license]: https://img.shields.io/badge/license-MIT%2FApache-blue.svg
+[img_downloads]:https://img.shields.io/crates/d/bevy_adventure.svg
+[img_tracking]: https://img.shields.io/badge/Bevy%20tracking-released%20version-lightblue
+
+[bevy]: https://crates.io/crates/bevy/0.9.1
 [crates]: https://crates.io/crates/bevy_adventure
 [doc]: https://docs.rs/bevy_adventure/
+[license]: https://github.com/hankjordan/bevy_adventure#license
+[tracking]: https://github.com/bevyengine/bevy/blob/main/docs/plugins_guidelines.md#main-branch-tracking

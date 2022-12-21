@@ -36,7 +36,7 @@ impl CurrentSpot {
     }
 
     /// Returns the name of the `CameraSpot` the `CurrentSpot` is currently set to.
-    /// 
+    ///
     /// # Panics
     /// If the Scene has not been set up yet, or there is no `MAIN_CAMERA` spot.
     pub fn name(&self) -> &str {
@@ -111,7 +111,7 @@ impl<'w, 's> CameraSpots<'w, 's> {
     }
 
     /// Given an interactive entity, retrieve a `CameraSpot` from the interactive's name.
-    /// 
+    ///
     /// Only works if the name of the `CameraSpot` matches `Camera_ENTITY_NAME`
     pub fn for_interactive(&self, entity: Entity) -> Option<CameraSpot> {
         if let Ok(name) = self.named.get(entity) {

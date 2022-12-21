@@ -1,7 +1,7 @@
 use crate::Item;
 
 /// A reference to an item, passed into an Interactive.
-/// 
+///
 /// Allows the Interactive to optionally consume the item when used.
 pub struct ItemRef<'a> {
     item: &'a Item,
