@@ -15,7 +15,7 @@ serde = ["dep:serde"]
 bevy = { version = "0.9", features = ["jpeg"] }
 
 [dependencies]
-bevy = { version = "0.9", default-features = false }
+bevy = { version = "0.9", default-features = false, features = ["animation"] }
 bevy_mod_raycast = "0.7"
 bevy_rapier3d = "0.19"
 iyes_loopless = "0.9"
