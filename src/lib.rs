@@ -8,10 +8,13 @@
 pub use crate::{
     animation::AnimationServer,
     camera::{
-        AtSpot,
         BackToSpot,
         BackToState,
+        CameraSpot,
+        CameraSpots,
+        CurrentSpot,
         Ignores,
+        NextSpot,
     },
     commands::CommandsExt,
     constants::MAIN_CAMERA,

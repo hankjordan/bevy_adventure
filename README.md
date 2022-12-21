@@ -18,7 +18,9 @@ A framework for building 3d adventure games in Bevy.
 `bevy_adventure` intentionally omits implementing save state functionality, as different games will have different requirements.
 
 If you want to implement this, here is what you need to keep track of:
-- `AtSpot` camera component, which determines your current spot in the scene
+- `CurrentSpot` resource, which determines your current camera spot in the scene.
+Save the name of the `CameraSpot` from this resource and when loading use the name
+to lookup the `CameraSpot` from the `CameraSpots` `SystemParam`.
 - `CurrentState<State>` resource, (from `iyes_loopless`) which determines what scene is currently loaded
 - `Inventory` resource, which tracks what items the player is holding
 - `WorldState` resource, the global game state storage

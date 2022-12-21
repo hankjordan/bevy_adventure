@@ -9,7 +9,7 @@ use iyes_loopless::state::NextState;
 use crate::{
     animation::AnimationRegistry,
     camera::{
-        AtSpot,
+        CurrentSpot,
         BackToSpot,
         BackToState,
         CameraSpots,
@@ -27,10 +27,10 @@ use crate::{
     },
     commands::CommandsExt,
     state::WorldState,
-    textdisplay::{TextDisplay, Message},
+    textdisplay::{TextDisplay, Message}, MAIN_CAMERA,
 };
 
-type CameraQuery = (&'static Camera, &'static GlobalTransform, &'static AtSpot);
+type CameraQuery = (&'static Camera, &'static GlobalTransform);
 
 #[derive(SystemParam)]
 pub struct InteractiveQuery<'w, 's, T: Interactive + Component + 'static> {
@@ -56,14 +56,15 @@ pub fn interactive<T: Interactive + Component>(
     mut inventory: ResMut<Inventory>,
     animation_server: Res<AnimationRegistry>,
     mut state: ResMut<WorldState>,
+    at_spot: ResMut<CurrentSpot>,
     mut next_spot: ResMut<NextSpot>,
 
     mut query: InteractiveQuery<T>,
 ) {
     if input.just_released(MouseButton::Left) {
-        let (camera, gtf, at_spot) = query.camera.get_single().unwrap();
+        let (camera, gtf) = query.camera.get_single().unwrap();
 
-        if next_spot.is_none() {
+        if next_spot.is_none() && at_spot.is_some() {
             let cursor = window.primary().cursor_position().unwrap();
 
             if cursor.y > 100.0 {
@@ -71,7 +72,7 @@ pub fn interactive<T: Interactive + Component>(
 
                 let mut ignores = Vec::new();
 
-                if let Ok(ignored) = query.ignore.get(at_spot.0) {
+                if let Ok(ignored) = query.ignore.get(at_spot.get().entity()) {
                     ignores.extend(commands.named_any(&ignored.names));
                 }
 
@@ -83,9 +84,9 @@ pub fn interactive<T: Interactive + Component>(
                     QueryFilter::new().predicate(&|entity| !ignores.contains(&entity)),
                 ) {
                     if let Ok(mut interactive) = query.interactives.get_mut(entity) {
-                        if at_spot.0 != entity {
-                            if let Some(mut spot) = spots.find(entity) {
-                                spot.entity = entity;
+                        if at_spot.get().entity() != entity {
+                            if let Some(mut spot) = spots.for_interactive(entity) {
+                                spot.set_entity(entity);
                                 next_spot.set(spot);
                                 return;
                             }
@@ -128,13 +129,13 @@ pub fn interactive<T: Interactive + Component>(
                     }
                 }
             } else if !dragging.is_dragging() {
-                if let Ok(back) = query.back_spot.get(at_spot.0) {
-                    if let Some(spot) = spots.get(&back.spot) {
+                if let Ok(back) = query.back_spot.get(at_spot.get().entity()) {
+                    if let Some(spot) = spots.get(&back.name) {
                         next_spot.set(spot);
                     }
-                } else if let Ok(back) = query.back_state.get(at_spot.0) {
+                } else if let Ok(back) = query.back_state.get(at_spot.get().entity()) {
                     commands.insert_resource(NextState(back.state.clone()));
-                } else if let Some(spot) = spots.get("Camera_Main") {
+                } else if let Some(spot) = spots.get(MAIN_CAMERA) {
                     next_spot.set(spot);
                 }
             }

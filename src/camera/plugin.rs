@@ -1,6 +1,9 @@
 use bevy::prelude::*;
 
-use crate::camera::next::NextPlugin;
+use crate::camera::{
+    next::NextPlugin,
+    spot::CameraSpotPlugin,
+};
 
 pub struct CameraPlugin;
 
@@ -8,6 +11,7 @@ pub struct CameraPlugin;
 impl Plugin for CameraPlugin {
     fn build(&self, app: &mut App) {
         app
+            .add_plugin(CameraSpotPlugin)
             .add_plugin(NextPlugin);
     }
 }

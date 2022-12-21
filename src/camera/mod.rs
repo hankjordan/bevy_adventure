@@ -12,7 +12,8 @@ pub use ignores::Ignores;
 pub use next::NextSpot;
 pub use plugin::CameraPlugin;
 pub use spot::{
-    AtSpot,
-    IsCameraSpot,
+    CameraSpot,
     CameraSpots,
+    CurrentSpot,
+    IsCameraSpot,
 };

@@ -6,14 +6,14 @@ use bevy::prelude::*;
 #[derive(Component, Debug)]
 pub struct BackToSpot {
     /// The name of the target spot.
-    pub spot: String,
+    pub name: String,
 }
 
 impl BackToSpot {
     /// Returns a new instance of `BackToSpot`.
-    pub fn new(spot: &str) -> Self {
+    pub fn new(name: &str) -> Self {
         Self {
-            spot: spot.to_owned(),
+            name: name.to_owned(),
         }
     }
 }
