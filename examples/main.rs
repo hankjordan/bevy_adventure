@@ -8,17 +8,19 @@ use bevy::{
 use bevy_adventure::{
     Action,
     AdventurePlugin,
+    AnimationServer,
     AppSceneStateExt,
     CommandsExt,
     Description,
     Ignores,
     Interactive,
+    Item,
     Message,
     MoveTo,
     NewMessage,
     Portal,
     Scene,
-    WorldState, AnimationServer,
+    WorldState,
 };
 use bevy_rapier3d::prelude::*;
 use iyes_loopless::prelude::AppLooplessStateExt;
@@ -86,7 +88,7 @@ struct Dresser {
     next: usize,
 }
 
-const DRESSER_TAKEN: &str = "c1_bedroom_dresser_taken";
+const DRESSER_TAKEN: &str = "bedroom_dresser_taken";
 
 const DRESSER_TOP_OPEN: &str = "Animation3";
 const DRESSER_TOP_CLOSE: &str = "Animation2";
@@ -111,7 +113,7 @@ impl Interactive for Dresser {
             Action::Animation(DRESSER_BOTTOM_OPEN.to_owned()),
             Action::Animation(DRESSER_BOTTOM_CLOSE.to_owned()),
             Action::Animation(DRESSER_TOP_OPEN.to_owned()),
-            Action::AddItem(ITEM_FLASHLIGHT_EMPTY.to_owned()),
+            Item::new(ITEM_FLASHLIGHT_EMPTY).into(),
             Action::Animation(DRESSER_TOP_CLOSE.to_owned()),
         ];
 
@@ -151,7 +153,7 @@ impl Interactive for TrashCan {
             Action::Message(Message::new("The trash can is empty.")).single()
         } else {
             state.set(TRASH_CAN_EMPTY, true);
-            Action::AddItem(ITEM_BATTERIES.to_owned()).single()
+            Item::new(ITEM_BATTERIES).into()
         }
     }
 }
@@ -216,7 +218,6 @@ impl Scene for BedroomScene {
             //
             // Creating a camera in the scene with the name Camera_OBJECT will
             // cause this effect for OBJECT.
-
             Some(TRASH_CAN) => commands
                 .insert(Collider::cuboid(0.3, 0.3, 0.3))
                 .insert(TrashCan),

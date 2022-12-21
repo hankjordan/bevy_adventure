@@ -3,6 +3,8 @@ use bevy::{
     prelude::*,
 };
 
+use crate::Item;
+
 pub struct TextDisplayPlugin;
 
 #[rustfmt::skip]
@@ -19,25 +21,25 @@ pub enum Message {
     /// Free-form text.
     Text(String),
 
-    /// The name of an item that has just been picked up.
-    ItemPickup(String),
+    /// The Item that has just been picked up.
+    ItemPickup(Item),
 
     /// The result of a successful item combination (`source -> destination = result`).
     ItemCombine {
-        /// Source item name
-        src: String,
+        /// Source Item
+        src: Item,
 
-        /// Destination item name
-        dst: String, 
+        /// Destination Item
+        dst: Item,
 
-        /// Result item name
-        result: String 
+        /// Result Item
+        result: Item,
     },
 
-    /// The result of an unsuccesful item combination.
+    /// The result of an unsuccesful Item combination.
     InvalidItemCombination,
 
-    /// A message sent when the wrong item is used on an Interactive.
+    /// A message sent when the wrong Item is used on an Interactive.
     InvalidItemUsed,
 }
 

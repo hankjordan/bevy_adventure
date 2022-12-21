@@ -16,6 +16,7 @@ pub use crate::{
     commands::CommandsExt,
     constants::MAIN_CAMERA,
     interactives::{
+        invalid_item_used,
         Action,
         Description,
         Interactive,
@@ -26,6 +27,7 @@ pub use crate::{
     inventory::{
         DraggingItem,
         Inventory,
+        Item,
         Recipes,
     },
     plugin::AdventurePlugin,

@@ -5,6 +5,7 @@ mod systems;
 mod util;
 
 pub use actions::{
+    invalid_item_used,
     Action,
     Interactive,
 };

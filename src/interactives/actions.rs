@@ -8,13 +8,14 @@ use crate::{
     interactives::ItemRef,
     state::WorldState,
     textdisplay::Message,
+    Item,
 };
 
 /// An enum of possible actions an Interactive might take after being interacted with in some way.
 #[derive(Clone, Debug)]
 pub enum Action<State> {
     /// Add an item to the player's inventory.
-    AddItem(String),
+    AddItem(Item),
 
     /// Play an animation.
     Animation(String),
@@ -34,6 +35,41 @@ impl<State> Action<State> {
     pub fn single(self) -> Vec<Self> {
         vec![self]
     }
+}
+
+impl<T> From<Action<T>> for Vec<Action<T>> {
+    fn from(action: Action<T>) -> Self {
+        vec![action]
+    }
+}
+
+impl<T> From<Item> for Action<T> {
+    fn from(item: Item) -> Self {
+        Action::AddItem(item)
+    }
+}
+
+impl<T> From<Item> for Vec<Action<T>> {
+    fn from(item: Item) -> Self {
+        vec![item.into()]
+    }
+}
+
+impl<T> From<Message> for Action<T> {
+    fn from(message: Message) -> Self {
+        Action::Message(message)
+    }
+}
+
+impl<T> From<Message> for Vec<Action<T>> {
+    fn from(message: Message) -> Self {
+        vec![message.into()]
+    }
+}
+
+/// Helper function that returns an action with a `InvalidItemUsed` message.
+pub fn invalid_item_used<T>() -> Vec<Action<T>> {
+    Action::Message(Message::InvalidItemUsed).single()
 }
 
 /// Trait that allows you to define behavior for an object in a Scene.

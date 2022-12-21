@@ -34,17 +34,50 @@ impl Plugin for InventoryPlugin {
 #[derive(Resource, Debug, Default)]
 pub struct Inventory {
     /// The items held in the inventory.
-    pub items: HashSet<String>,
+    pub items: HashSet<Item>,
+}
+
+/// An item.
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
+pub struct Item {
+    name: String,
+}
+
+impl Item {
+    /// Returns a new Item with the given name.
+    pub fn new(name: &str) -> Self {
+        Self {
+            name: name.to_owned(),
+        }
+    }
+
+    /// The name of the Item.
+    pub fn as_str(&self) -> &str {
+        &self.name
+    }
+}
+
+impl From<&str> for Item {
+    fn from(name: &str) -> Self {
+        Item::new(name)
+    }
+}
+
+impl From<String> for Item {
+    fn from(name: String) -> Self {
+        Item::new(&name)
+    }
 }
 
 /// A resource that stores which items are being dragged, if any.
 #[derive(Resource, Default)]
 pub struct DraggingItem {
     /// Source item name
-    pub src: Option<String>,
+    pub src: Option<Item>,
 
     /// Destination item name
-    pub dst: Option<String>,
+    pub dst: Option<Item>,
 }
 
 impl DraggingItem {
@@ -57,22 +90,20 @@ impl DraggingItem {
 /// A resource that stores all registered item combinations.
 #[derive(Resource, Default)]
 pub struct Recipes {
-    map: HashMap<(String, String), String>,
+    map: HashMap<(Item, Item), Item>,
 }
 
 impl Recipes {
     /// Insert a new recipe into the map.
     /// Order is ignored (`(a, b) == (b, a)`).
     pub fn insert(&mut self, a: &str, b: &str, result: &str) {
-        self.map
-            .insert((a.to_owned(), b.to_owned()), result.to_owned());
-        self.map
-            .insert((b.to_owned(), a.to_owned()), result.to_owned());
+        self.map.insert((a.into(), b.into()), result.into());
+        self.map.insert((b.into(), a.into()), result.into());
     }
 
     /// Given a source and a destination, return the matching combination result, if any.
-    pub fn get(&self, src: &str, dst: &str) -> Option<&String> {
-        self.map.get(&(src.to_owned(), dst.to_owned()))
+    pub fn get(&self, src: &Item, dst: &Item) -> Option<&Item> {
+        self.map.get(&(src.clone(), dst.clone()))
     }
 }
 
