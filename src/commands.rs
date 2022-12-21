@@ -3,6 +3,7 @@ use bevy::{
     prelude::*,
 };
 
+/// `SystemParam` that acts as an extension to `Commands` for working with named entities.
 #[derive(SystemParam)]
 pub struct CommandsExt<'w, 's> {
     commands: Commands<'w, 's>,
@@ -11,6 +12,7 @@ pub struct CommandsExt<'w, 's> {
 }
 
 impl<'w, 's> CommandsExt<'w, 's> {
+    /// Returns a Vec of entities matching the given name.
     pub fn named(&self, target: &str) -> Vec<Entity> {
         let mut result = Vec::new();
 
@@ -23,6 +25,7 @@ impl<'w, 's> CommandsExt<'w, 's> {
         result
     }
 
+    /// Returns a Vec of entities matching any of the given names.
     pub fn named_any<T: AsRef<str>>(&self, targets: &Vec<T>) -> Vec<Entity> {
         let mut result = Vec::new();
 
@@ -38,18 +41,21 @@ impl<'w, 's> CommandsExt<'w, 's> {
         result
     }
 
+    /// Despawn all entities with the given name.
     pub fn despawn_named(&mut self, target: &str) {
         for entity in self.named(target) {
             self.commands.entity(entity).despawn_recursive();
         }
     }
 
+    /// Despawn all entities with any of the given names.
     pub fn despawn_all_named(&mut self, targets: &Vec<&str>) {
         for entity in self.named_any(targets) {
             self.commands.entity(entity).despawn_recursive();
         }
     }
 
+    /// Set `Visibility.is_visible` to true for all entities with the given name.
     pub fn show_named(&mut self, target: &str) {
         for entity in self.named(target) {
             if let Ok(mut visibility) = self.visibility.get_mut(entity) {
@@ -58,6 +64,7 @@ impl<'w, 's> CommandsExt<'w, 's> {
         }
     }
 
+    /// Set `Visibility.is_visible` to false for all entities with the given name.
     pub fn hide_named(&mut self, target: &str) {
         for entity in self.named(target) {
             if let Ok(mut visibility) = self.visibility.get_mut(entity) {

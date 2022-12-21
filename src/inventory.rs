@@ -33,39 +33,22 @@ impl Plugin for InventoryPlugin {
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Resource, Debug, Default)]
 pub struct Inventory {
+    /// The items held in the inventory.
     pub items: HashSet<String>,
-}
-
-/// A newly created item, with an optional message to show when picking it up.
-#[derive(Clone, Debug)]
-pub struct AddedItem {
-    pub name: String,
-    pub message: Option<String>,
-}
-
-impl AddedItem {
-    pub fn new(name: &str) -> Self {
-        Self {
-            name: name.to_owned(),
-            message: None,
-        }
-    }
-
-    #[must_use]
-    pub fn with_message(mut self, message: &str) -> Self {
-        self.message = Some(message.to_owned());
-        self
-    }
 }
 
 /// A resource that stores which items are being dragged, if any.
 #[derive(Resource, Default)]
 pub struct DraggingItem {
+    /// Source item name
     pub src: Option<String>,
+
+    /// Destination item name
     pub dst: Option<String>,
 }
 
 impl DraggingItem {
+    /// Returns true if either the source or the destination is Some.
     pub fn is_dragging(&self) -> bool {
         self.src.is_some() || self.dst.is_some()
     }
@@ -87,6 +70,7 @@ impl Recipes {
             .insert((b.to_owned(), a.to_owned()), result.to_owned());
     }
 
+    /// Given a source and a destination, return the matching combination result, if any.
     pub fn get(&self, src: &str, dst: &str) -> Option<&String> {
         self.map.get(&(src.to_owned(), dst.to_owned()))
     }

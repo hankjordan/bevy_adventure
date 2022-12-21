@@ -23,7 +23,16 @@ pub enum Message {
     ItemPickup(String),
 
     /// The result of a successful item combination (`source -> destination = result`).
-    ItemCombine { src: String, dst: String, result: String },
+    ItemCombine {
+        /// Source item name
+        src: String,
+
+        /// Destination item name
+        dst: String, 
+
+        /// Result item name
+        result: String 
+    },
 
     /// The result of an unsuccesful item combination.
     InvalidItemCombination,

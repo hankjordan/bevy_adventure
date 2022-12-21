@@ -9,6 +9,8 @@ use bevy_adventure::{
     Action,
     AdventurePlugin,
     AppSceneStateExt,
+    CommandsExt,
+    Description,
     Ignores,
     Interactive,
     Message,
@@ -16,7 +18,7 @@ use bevy_adventure::{
     NewMessage,
     Portal,
     Scene,
-    WorldState,
+    WorldState, AnimationServer,
 };
 use bevy_rapier3d::prelude::*;
 use iyes_loopless::prelude::AppLooplessStateExt;
@@ -25,6 +27,7 @@ use iyes_loopless::prelude::AppLooplessStateExt;
 pub enum GameState {
     MainMenu,
     Bathroom,
+    Bedroom,
     Hallway,
 }
 
@@ -78,6 +81,172 @@ impl Scene for BathroomScene {
     }
 }
 
+#[derive(Component, Default)]
+struct Dresser {
+    next: usize,
+}
+
+const DRESSER_TAKEN: &str = "c1_bedroom_dresser_taken";
+
+const DRESSER_TOP_OPEN: &str = "Animation3";
+const DRESSER_TOP_CLOSE: &str = "Animation2";
+const DRESSER_BOTTOM_OPEN: &str = "Animation1";
+const DRESSER_BOTTOM_CLOSE: &str = "Animation0";
+
+const FLASHLIGHT_OBJECT: &str = "Flashlight";
+
+const ITEM_FLASHLIGHT_EMPTY: &str = "Flashlight (empty)";
+
+impl Interactive for Dresser {
+    type State = GameState;
+
+    fn update(&mut self, commands: &mut CommandsExt, state: &mut ResMut<WorldState>) {
+        if state.get_bool(DRESSER_TAKEN) {
+            commands.despawn_named(FLASHLIGHT_OBJECT);
+        }
+    }
+
+    fn interact(&mut self, state: &mut ResMut<WorldState>) -> Vec<Action<Self::State>> {
+        let actions = vec![
+            Action::Animation(DRESSER_BOTTOM_OPEN.to_owned()),
+            Action::Animation(DRESSER_BOTTOM_CLOSE.to_owned()),
+            Action::Animation(DRESSER_TOP_OPEN.to_owned()),
+            Action::AddItem(ITEM_FLASHLIGHT_EMPTY.to_owned()),
+            Action::Animation(DRESSER_TOP_CLOSE.to_owned()),
+        ];
+
+        if self.next == 3 {
+            if state.get_bool(DRESSER_TAKEN) {
+                self.next += 1;
+            } else {
+                state.set(DRESSER_TAKEN, true);
+            }
+        }
+
+        let val = actions[self.next].clone();
+
+        self.next = (self.next + 1) % actions.len();
+
+        val.single()
+    }
+}
+
+#[derive(Component, Default)]
+struct TrashCan;
+
+const ITEM_BATTERIES: &str = "Batteries";
+const TRASH_CAN_EMPTY: &str = "bedroom_trash_can_empty";
+
+impl Interactive for TrashCan {
+    type State = GameState;
+
+    fn update(&mut self, commands: &mut CommandsExt, state: &mut ResMut<WorldState>) {
+        if state.get_bool(TRASH_CAN_EMPTY) {
+            commands.despawn_all_named(&vec!["Battery_01", "Battery_02"]);
+        }
+    }
+
+    fn interact(&mut self, state: &mut ResMut<WorldState>) -> Vec<Action<Self::State>> {
+        if state.get_bool(TRASH_CAN_EMPTY) {
+            Action::Message(Message::new("The trash can is empty.")).single()
+        } else {
+            state.set(TRASH_CAN_EMPTY, true);
+            Action::AddItem(ITEM_BATTERIES.to_owned()).single()
+        }
+    }
+}
+
+struct BedroomScene;
+
+impl Scene for BedroomScene {
+    type State = GameState;
+
+    fn state() -> Self::State {
+        GameState::Bedroom
+    }
+
+    fn scene<'a>() -> &'a str {
+        "scenes/bedroom.glb#Scene0"
+    }
+
+    fn animations(server: &mut AnimationServer) {
+        server ////
+            .load::<Self>(DRESSER_TOP_OPEN)
+            .load::<Self>(DRESSER_TOP_CLOSE)
+            .load::<Self>(DRESSER_BOTTOM_OPEN)
+            .load::<Self>(DRESSER_BOTTOM_CLOSE);
+    }
+
+    fn setup(app: &mut App) {
+        app ////
+            .register_interactive::<Self, Dresser>()
+            .register_interactive::<Self, TrashCan>();
+    }
+
+    fn spawn(entity: &EntityRef, commands: &mut EntityCommands) {
+        const BED: &str = "Bed";
+        const DOOR: &str = "Door";
+        const DOOR_HINGE_TOP: &str = "Door_Hinge_Top";
+        const DRESSER: &str = "Dresser";
+        const TRASH_CAN: &str = "Trash_Can";
+        const PAINTING: &str = "Painting";
+        const OLD_MONITOR: &str = "Old_Monitor";
+        const HAMPER: &str = "Hamper";
+        const BOOKSHELF: &str = "Bookshelf";
+
+        match entity.get::<Name>().map(|t| t.as_str()) {
+            Some(BED) => commands
+                .insert(Collider::cuboid(0.5, 1.0, 0.5))
+                .insert(Description::new("It's a bed.")),
+            Some(DOOR_HINGE_TOP) => commands
+                .insert(Collider::cuboid(0.25, 0.25, 0.25))
+                .insert(Description::new("It's a door hinge.")),
+            Some(DOOR) => commands
+                .insert(Collider::cuboid(0.1, 0.5, 1.1))
+                .insert(Portal::new(GameState::Hallway)),
+            Some(DRESSER) => commands
+                .insert(Collider::cuboid(0.75, 0.5, 0.5))
+                .insert(Dresser::default()),
+
+            // Note that we don't actually define a CameraSpot for the Trash Can
+            // but the camera still zooms in on it when interacting.
+            //
+            // This is because the CameraSpot with the name `Camera_Trash_Can`
+            // is automatically tried when we interact with the Trash Can.
+            //
+            // Creating a camera in the scene with the name Camera_OBJECT will
+            // cause this effect for OBJECT.
+
+            Some(TRASH_CAN) => commands
+                .insert(Collider::cuboid(0.3, 0.3, 0.3))
+                .insert(TrashCan),
+
+            Some(PAINTING) => commands
+                .insert(Collider::cuboid(0.5, 0.5, 0.5))
+                .insert(Description::new("I like this painting.")),
+            Some(OLD_MONITOR) => {
+                commands
+                    .insert(Collider::cuboid(0.3, 0.3, 0.3))
+                    .insert(Description::new(
+                        "My computer barely works. I really need a new one.",
+                    ))
+            }
+            Some(HAMPER) => commands
+                .insert(Collider::cuboid(0.3, 0.3, 0.3))
+                .insert(Description::new("The hamper is empty.")),
+            Some(BOOKSHELF) => {
+                commands
+                    .insert(Collider::cuboid(0.5, 0.2, 0.5))
+                    .insert(Description::new(
+                        "The books are ordered and lined up neatly.",
+                    ))
+            }
+
+            _ => commands,
+        };
+    }
+}
+
 struct HallwayScene;
 
 impl Scene for HallwayScene {
@@ -92,18 +261,22 @@ impl Scene for HallwayScene {
     }
 
     fn spawn(entity: &EntityRef, commands: &mut EntityCommands) {
+        const BEDROOM_DOOR: &str = "Door";
         const BATHROOM_DOOR: &str = "Door.001";
 
         match entity.get::<Name>().map(|t| t.as_str()) {
             Some(BATHROOM_DOOR) => commands
                 .insert(Collider::cuboid(0.1, 0.5, 1.1))
                 .insert(Portal::new(GameState::Bathroom)),
+            Some(BEDROOM_DOOR) => commands
+                .insert(Collider::cuboid(0.1, 0.5, 1.1))
+                .insert(Portal::new(GameState::Bedroom)),
             _ => commands,
         };
     }
 }
 
-fn display_messages(mut messages: EventReader<NewMessage>) {
+fn print_messages(mut messages: EventReader<NewMessage>) {
     for message in messages.iter() {
         println!("Message: {:?}", message);
     }
@@ -124,9 +297,10 @@ fn main() {
         .add_loopless_state(GameState::Bathroom)
         ////
         .add_scene::<BathroomScene>()
+        .add_scene::<BedroomScene>()
         .add_scene::<HallwayScene>()
         ////
-        .add_system(display_messages)
+        .add_system(print_messages)
         ////
         .run();
 }

@@ -5,16 +5,19 @@ use bevy::prelude::*;
 /// Useful for creating area triggers.
 #[derive(Component, Default)]
 pub struct Ignores {
+    /// The names of the entities to ignore.
     pub names: Vec<String>,
 }
 
 impl Ignores {
+    /// Returns a new instance of `Ignores`.
     pub fn new(names: Vec<&str>) -> Self {
         Self {
             names: names.into_iter().map(|n| n.to_owned()).collect(),
         }
     }
 
+    /// Returns a new instance of `Ignores`, from a single value.
     pub fn single(name: &str) -> Self {
         Self::new(vec![name])
     }

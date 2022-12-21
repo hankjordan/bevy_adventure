@@ -1,3 +1,4 @@
+#![warn(missing_docs)]
 #![warn(clippy::pedantic)]
 #![allow(clippy::module_name_repetitions)]
 #![allow(clippy::must_use_candidate)]
@@ -5,12 +6,14 @@
 #![doc = include_str!("../README.md")]
 
 pub use crate::{
+    animation::AnimationServer,
     camera::{
         AtSpot,
         BackToSpot,
         BackToState,
         Ignores,
     },
+    commands::CommandsExt,
     constants::MAIN_CAMERA,
     interactives::{
         Action,
@@ -20,7 +23,6 @@ pub use crate::{
         Portal,
     },
     inventory::{
-        AddedItem,
         DraggingItem,
         Inventory,
         Recipes,

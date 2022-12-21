@@ -18,6 +18,7 @@ pub struct Description {
 }
 
 impl Description {
+    /// Returns a new instance of `Description` with the given text.
     pub fn new(text: &str) -> Self {
         Self {
             text: text.to_owned(),
@@ -40,6 +41,7 @@ pub struct MoveTo {
 }
 
 impl MoveTo {
+    /// Returns a new instance of `MoveTo` with the given spot name.
     pub fn new(spot: &str) -> Self {
         Self {
             spot: spot.to_owned(),
@@ -62,6 +64,7 @@ pub struct Portal<T> {
 }
 
 impl<T> Portal<T> {
+    /// Returns a new instance of `Portal` with the given state.
     pub fn new(state: T) -> Self {
         Self { state }
     }

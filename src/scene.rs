@@ -14,7 +14,10 @@ use bevy::{
 use iyes_loopless::prelude::*;
 
 use crate::{
-    animation::Tween,
+    animation::{
+        AnimationServer,
+        Tween,
+    },
     camera::IsCameraSpot,
     interactives::interactive,
     AtSpot,
@@ -115,6 +118,12 @@ impl<'w, 's> SceneManager<'w, 's> {
                     commands.insert(IsCameraSpot);
                 }
 
+                if let Some(light) = entity.get::<PointLight>() {
+                    let mut light = *light;
+                    light.shadows_enabled = true;
+                    commands.insert(light);
+                }
+
                 hook(entity, commands);
             }),
         )
@@ -141,6 +150,9 @@ pub trait Scene {
 
     /// A path to a scene file that can be loaded by Bevy's `asset_loader`.
     fn scene<'a>() -> &'a str;
+
+    /// An optional setup method that allows you to register animations by name.
+    fn animations(server: &mut AnimationServer) {}
 
     /// An optional setup method that allows you to modify the App when adding the Scene.
     fn setup(app: &mut App) {}
@@ -186,7 +198,8 @@ impl AppSceneStateExt for App {
     }
 }
 
-fn spawn_scene<S: Scene + 'static>(mut manager: SceneManager) {
+fn spawn_scene<S: Scene + 'static>(mut manager: SceneManager, mut server: AnimationServer) {
+    S::animations(&mut server);
     manager.spawn(S::scene(), S::spawn);
 }
 

@@ -1,6 +1,8 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, marker::PhantomData};
 
-use bevy::prelude::*;
+use bevy::{prelude::*, ecs::system::SystemParam};
+
+use crate::Scene;
 
 pub struct AnimationPlugin;
 
@@ -8,7 +10,7 @@ pub struct AnimationPlugin;
 impl Plugin for AnimationPlugin {
     fn build(&self, app: &mut App) {
         app
-            .insert_resource(AnimationServer::default())
+            .insert_resource(AnimationRegistry::default())
             
             .add_system(tween_transforms);
     }
@@ -36,21 +38,49 @@ fn tween_transforms(time: Res<Time>, mut targets: Query<(&Tween<Transform>, &mut
 }
 
 #[derive(Resource, Debug, Default)]
-pub struct AnimationServer {
+pub struct AnimationRegistry {
     map: HashMap<String, Handle<AnimationClip>>,
 }
 
-impl AnimationServer {
-    // TODO: Add animations to example
-    #[allow(dead_code)]
-    pub fn load(&mut self, asset_server: &Res<AssetServer>, scene: &str, name: &str) {
+impl AnimationRegistry {
+    fn insert(&mut self, name: &str, handle: Handle<AnimationClip>) {
         self.map.insert(
             name.to_owned(),
-            asset_server.load(format!("{scene}#{name}")),
+            handle
         );
     }
 
     pub fn get(&self, name: &str) -> Option<Handle<AnimationClip>> {
         self.map.get(&name.to_owned()).cloned()
+    }
+}
+
+/// `SystemParam` for registering named Animations.
+#[derive(SystemParam)]
+pub struct AnimationServer<'w, 's> {
+    asset_server: Res<'w, AssetServer>,
+    registry: ResMut<'w, AnimationRegistry>,
+
+    #[system_param(ignore)]
+    marker: PhantomData<&'s ()>,
+}
+
+impl<'w, 's> AnimationServer<'w, 's> {
+    /// Load a named animation for a given Scene.
+    pub fn load<S: Scene>(&mut self, name: &str) -> &mut Self {
+        let full = S::scene();
+
+        let scene;
+
+        if let Some((short, _)) = full.rsplit_once('#') {
+            scene = short;
+        } else {
+            scene = full;
+        }
+
+        let handle = self.asset_server.load(format!("{scene}#{name}"));
+        self.registry.insert(name, handle);
+
+        self
     }
 }

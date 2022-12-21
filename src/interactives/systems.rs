@@ -7,7 +7,7 @@ use bevy_rapier3d::prelude::*;
 use iyes_loopless::state::NextState;
 
 use crate::{
-    animation::AnimationServer,
+    animation::AnimationRegistry,
     camera::{
         AtSpot,
         BackToSpot,
@@ -54,7 +54,7 @@ pub fn interactive<T: Interactive + Component>(
     ctx: Res<RapierContext>,
     dragging: Res<DraggingItem>,
     mut inventory: ResMut<Inventory>,
-    animation_server: Res<AnimationServer>,
+    animation_server: Res<AnimationRegistry>,
     mut state: ResMut<WorldState>,
     mut next_spot: ResMut<NextSpot>,
 
@@ -107,15 +107,8 @@ pub fn interactive<T: Interactive + Component>(
 
                         for action in actions {
                             match action {
-                                Action::AddItem(added) => {
-                                    let name = added.name;
-
-                                    if let Some(message) = added.message {
-                                        display.show(Message::new(&message));
-                                    } else {
-                                        display.show(Message::ItemPickup(name.clone()));
-                                    }
-
+                                Action::AddItem(name) => {
+                                    display.show(Message::ItemPickup(name.clone()));
                                     inventory.items.insert(name);
                                 }
                                 Action::Animation(animation) => {

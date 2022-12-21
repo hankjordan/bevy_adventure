@@ -6,7 +6,6 @@ use bevy::{
 use crate::{
     commands::CommandsExt,
     interactives::ItemRef,
-    inventory::AddedItem,
     state::WorldState,
     textdisplay::Message,
 };
@@ -15,7 +14,7 @@ use crate::{
 #[derive(Clone, Debug)]
 pub enum Action<State> {
     /// Add an item to the player's inventory.
-    AddItem(AddedItem),
+    AddItem(String),
 
     /// Play an animation.
     Animation(String),

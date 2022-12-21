@@ -29,21 +29,32 @@ pub struct WorldState {
 }
 
 impl WorldState {
+    /// Retrieve a value from the map for a given key.
+    /// 
+    /// The output is parsed from the stored string.
     pub fn get<T: FromStr>(&self, key: &str) -> Option<T> {
         self.map
             .get(&key.to_owned())
             .and_then(|v| v.parse::<T>().ok())
     }
 
+    /// Retrieve a bool value from the map for a given key.
+    /// 
+    /// Returns false if the key does not exist.
     pub fn get_bool(&self, key: &str) -> bool {
         self.get(key).unwrap_or_default()
     }
 
-    pub fn insert<T: ToString>(&mut self, key: &str, value: &T) {
+    /// Insert a value into the map.
+    /// 
+    /// The value is converted to a string, so it must implement `ToString`.
+    #[allow(clippy::needless_pass_by_value)]
+    pub fn insert<T: ToString>(&mut self, key: &str, value: T) {
         self.map.insert(key.to_owned(), value.to_string());
     }
 
-    pub fn set<T: ToString>(&mut self, key: &str, value: &T) {
+    /// Alias for insert.
+    pub fn set<T: ToString>(&mut self, key: &str, value: T) {
         self.insert(key, value);
     }
 }
