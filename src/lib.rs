@@ -19,6 +19,7 @@ pub use crate::{
         Action,
         Description,
         Interactive,
+        ItemRef,
         MoveTo,
         Portal,
     },
