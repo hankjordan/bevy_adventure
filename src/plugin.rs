@@ -7,6 +7,7 @@ use bevy::{
 
 use crate::{
     animation::AnimationPlugin,
+    audio::AudioPlugin,
     camera::CameraPlugin,
     cursor::CursorPlugin,
     interactives::InteractivesPlugin,
@@ -35,6 +36,7 @@ where
     fn build(&self, app: &mut App) {
         app ////
             .add_plugin(AnimationPlugin)
+            .add_plugin(AudioPlugin)
             .add_plugin(CameraPlugin)
             .add_plugin(CursorPlugin)
             .add_plugin(InteractivesPlugin::<State>::default())

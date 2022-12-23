@@ -89,7 +89,7 @@ fn handle_next_spot(
                 commands.insert_resource(CurrentSpot::new(spot));
             }
         } else {
-            warn!("Could not find camera spot with name {:?}", name);
+            warn!("Could not find CameraSpot with name {:?}", name);
         }
     }
 }

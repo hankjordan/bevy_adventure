@@ -5,8 +5,22 @@
 #![allow(clippy::redundant_closure_for_method_calls)]
 #![doc = include_str!("../README.md")]
 
+mod animation;
+mod audio;
+mod camera;
+mod commands;
+mod constants;
+mod cursor;
+mod interactives;
+mod inventory;
+mod plugin;
+mod scene;
+mod state;
+mod textdisplay;
+
 pub use crate::{
     animation::AnimationServer,
+    audio::AudioServer,
     camera::{
         BackToSpot,
         BackToState,
@@ -46,15 +60,3 @@ pub use crate::{
         NewMessage,
     },
 };
-
-mod animation;
-mod camera;
-mod commands;
-mod constants;
-mod cursor;
-mod interactives;
-mod inventory;
-mod plugin;
-mod scene;
-mod state;
-mod textdisplay;

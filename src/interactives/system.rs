@@ -5,7 +5,7 @@ use bevy::{
 use iyes_loopless::state::NextState;
 
 use crate::{
-    animation::AnimationRegistry,
+    audio::AudioServer,
     camera::{
         BackToSpot,
         BackToState,
@@ -29,7 +29,9 @@ use crate::{
         Message,
         TextDisplay,
     },
-    MAIN_CAMERA, Cursor,
+    AnimationServer,
+    Cursor,
+    MAIN_CAMERA,
 };
 
 #[derive(SystemParam)]
@@ -46,12 +48,13 @@ pub fn interactive<T: Interactive + Component>(
     mut commands: CommandsExt,
     mut display: TextDisplay,
     spots: CameraSpots,
+    animation_server: AnimationServer,
+    audio_server: AudioServer,
 
     input: Res<Input<MouseButton>>,
     cursor: Res<Cursor>,
     dragging: Res<DraggingItem>,
     mut inventory: ResMut<Inventory>,
-    animation_server: Res<AnimationRegistry>,
     mut state: ResMut<WorldState>,
     at_spot: ResMut<CurrentSpot>,
     mut next_spot: ResMut<NextSpot>,
@@ -92,10 +95,15 @@ pub fn interactive<T: Interactive + Component>(
                                 display.show(Message::ItemPickup(name.clone()));
                                 inventory.items.insert(name);
                             }
-                            Action::Animation(animation) => {
+                            Action::Animation(name) => {
                                 for mut player in &mut query.players {
-                                    player.play(animation_server.get(animation.as_str()).unwrap());
+                                    if let Some(animation) = animation_server.get(&name) {
+                                        player.play(animation);
+                                    }
                                 }
+                            }
+                            Action::Audio(name) => {
+                                audio_server.play(&name);
                             }
                             Action::Message(text) => display.show(text),
                             Action::Transition(state) => {

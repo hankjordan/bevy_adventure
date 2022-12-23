@@ -72,9 +72,8 @@ Blender is a good choice to create GLTF scenes, but you must make sure you confi
 
 ## TODO
 
-- Audio
+- Audio example
 - Save state example
-- Gamepad support
 
 ## License
 

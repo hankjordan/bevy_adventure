@@ -53,8 +53,13 @@ impl AnimationRegistry {
         self.map.insert(name.to_owned(), handle);
     }
 
-    pub fn get(&self, name: &str) -> Option<Handle<AnimationClip>> {
-        self.map.get(&name.to_owned()).cloned()
+    fn get(&self, name: &str) -> Option<Handle<AnimationClip>> {
+        if let Some(animation) = self.map.get(&name.to_owned()) {
+            Some(animation.clone())
+        } else {
+            warn!("Could not find AnimationClip with name {:?}", name);
+            None
+        }
     }
 }
 
@@ -85,5 +90,10 @@ impl<'w, 's> AnimationServer<'w, 's> {
         self.registry.insert(name, handle);
 
         self
+    }
+
+    /// Returns a handle to a loaded `AnimationClip` given a name.
+    pub fn get(&self, name: &str) -> Option<Handle<AnimationClip>> {
+        self.registry.get(name)
     }
 }

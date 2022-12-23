@@ -20,6 +20,9 @@ pub enum Action<State> {
     /// Play an animation.
     Animation(String),
 
+    /// Play an audio clip.
+    Audio(String),
+
     /// Send a message.
     Message(Message),
 
