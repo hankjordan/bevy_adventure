@@ -1,7 +1,9 @@
 mod actions;
+mod hovering;
 mod plugin;
+mod ray;
 mod simple;
-mod systems;
+mod system;
 mod util;
 
 pub use actions::{
@@ -9,11 +11,12 @@ pub use actions::{
     Action,
     Interactive,
 };
+pub use hovering::Hovering;
 pub use plugin::InteractivesPlugin;
 pub use simple::{
     Description,
     MoveTo,
     Portal,
 };
-pub use systems::interactive;
+pub use system::interactive;
 pub use util::ItemRef;

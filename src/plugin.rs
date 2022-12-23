@@ -8,6 +8,7 @@ use bevy::{
 use crate::{
     animation::AnimationPlugin,
     camera::CameraPlugin,
+    cursor::CursorPlugin,
     interactives::InteractivesPlugin,
     inventory::InventoryPlugin,
     scene::SceneManagerPlugin,
@@ -16,23 +17,27 @@ use crate::{
 };
 
 /// The main plugin that must be added to your app with `add_plugin`.
-pub struct AdventurePlugin<S>(PhantomData<S>);
+///
+/// The generic parameter `State` should be the `StateData` for your game,
+/// usually an enum containing all of the different possible states.
+pub struct AdventurePlugin<State>(PhantomData<State>);
 
-impl<S> Default for AdventurePlugin<S> {
+impl<State> Default for AdventurePlugin<State> {
     fn default() -> Self {
         Self(PhantomData::default())
     }
 }
 
-impl<S> Plugin for AdventurePlugin<S>
+impl<State> Plugin for AdventurePlugin<State>
 where
-    S: StateData,
+    State: StateData,
 {
     fn build(&self, app: &mut App) {
         app ////
             .add_plugin(AnimationPlugin)
             .add_plugin(CameraPlugin)
-            .add_plugin(InteractivesPlugin::<S>::default())
+            .add_plugin(CursorPlugin)
+            .add_plugin(InteractivesPlugin::<State>::default())
             .add_plugin(InventoryPlugin)
             .add_plugin(SceneManagerPlugin)
             .add_plugin(TextDisplayPlugin)

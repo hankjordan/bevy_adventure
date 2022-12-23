@@ -6,6 +6,10 @@ use bevy::{
 };
 
 use crate::interactives::{
+    hovering::{
+        hovering_raycast,
+        Hovering,
+    },
     interactive,
     simple::{
         Description,
@@ -27,8 +31,12 @@ impl<S> Plugin for InteractivesPlugin<S>
 where S: StateData {
     fn build(&self, app: &mut App) {
         app
+            .init_resource::<Hovering>()
+
             .add_system(interactive::<Description>)
             .add_system(interactive::<MoveTo>)
-            .add_system(interactive::<Portal<S>>);
+            .add_system(interactive::<Portal<S>>)
+            
+            .add_system_to_stage(CoreStage::PreUpdate, hovering_raycast);
     }
 }

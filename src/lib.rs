@@ -18,10 +18,12 @@ pub use crate::{
     },
     commands::CommandsExt,
     constants::MAIN_CAMERA,
+    cursor::Cursor,
     interactives::{
         invalid_item_used,
         Action,
         Description,
+        Hovering,
         Interactive,
         ItemRef,
         MoveTo,
@@ -49,6 +51,7 @@ mod animation;
 mod camera;
 mod commands;
 mod constants;
+mod cursor;
 mod interactives;
 mod inventory;
 mod plugin;

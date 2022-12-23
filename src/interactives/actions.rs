@@ -67,7 +67,7 @@ impl<T> From<Message> for Vec<Action<T>> {
     }
 }
 
-/// Helper function that returns an action with a `InvalidItemUsed` message.
+/// Helper function that returns an action with an `InvalidItemUsed` message.
 pub fn invalid_item_used<T>() -> Vec<Action<T>> {
     Action::Message(Message::InvalidItemUsed).single()
 }

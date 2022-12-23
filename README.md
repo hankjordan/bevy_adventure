@@ -3,7 +3,7 @@
 
 A framework for building 3d adventure games in Bevy.
 
-https://user-images.githubusercontent.com/29737477/209001156-8c4916dd-327c-4e4f-aa22-9c2676a8134d.mp4
+<https://user-images.githubusercontent.com/29737477/209001156-8c4916dd-327c-4e4f-aa22-9c2676a8134d.mp4>
 
 ## Features
 
@@ -42,6 +42,33 @@ When you are building interactives, you have the ability to store information in
 The component should only hold temporary state information - like which drawer is open on a dresser or if an entity has been spawned.
 
 If you want to store any other kind of information, it should be done in the `WorldState` resource. This is so other interactives in your scene can access this state (for example, you'd flip a switch and the lights would go out) and so you are storing state information in a single place.
+
+### Creating scenes
+
+When implementing the Scene trait, the `scene` method should return a path to a file that can be loaded with the `AssetServer` to create a Bevy Scene.
+In practice this is a GLTF scene file, but any other format can be used as long as it creates a Bevy Scene when loaded.
+
+When imported with bevy_adventure, Cameras are automatically converted to CameraSpots, and PointLights are configured to cast shadows.
+
+The Scene trait's `spawn` method is called for every Entity in the scene - you can use this to assign components and initialize behavior for objects in your scene.
+The best way to do this is to match entity Names (from their names in the Scene), see the examples for an idea of how you should do this.
+
+The only real requirement for your scene is that you create a special Camera with the name `Camera_Main`.
+This is where your Camera will be positioned upon entering the Scene.
+**The app will panic if a scene is loaded without the Main Camera**.
+
+If you have issues matching objects by name, you might be matching the parent instead of the actual object you want to match.
+Adding a print statement inside of your Scene's spawn method might help you figure out if the object is actually being found.
+
+Note that when you are loading Scenes into Bevy, the 'Transform Scale' of each object is also loaded in.
+This could cause colliders to be the wrong size - you should 'apply Scale' before exporting.
+
+Object origin is also used loaded in - this could cause misaligned colliders if your object's origin doesn't match the center of your object.
+
+Blender is a good choice to create GLTF scenes, but you must make sure you configure the export settings correctly:
+
+- Under `Include`, check `Custom Properties`, `Cameras`, and `Punctual Lights`.
+- Under `Transform`, uncheck `Y+ Up`
 
 ## TODO
 
