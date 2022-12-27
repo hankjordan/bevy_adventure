@@ -47,7 +47,7 @@ pub fn hovering_raycast(
             ray.direction(),
             64.0,
             true,
-            QueryFilter::default(),
+            QueryFilter::new().predicate(&|entity| !ignores.contains(&entity)),
         ) {
             hovering.entity = Some(entity);
         }

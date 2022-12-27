@@ -117,9 +117,11 @@ pub fn interactive<T: Interactive + Component>(
         } else if !dragging.is_dragging() {
             if let Ok(back) = query.back_spot.get(at_spot.get().entity()) {
                 next_spot.set(&back.name);
-            } else if let Ok(back) = query.back_state.get(at_spot.get().entity()) {
-                commands.insert_resource(NextState(back.state.clone()));
             } else {
+                if let Ok(back) = query.back_state.get(at_spot.get().entity()) {
+                    commands.insert_resource(NextState(back.state.clone()));
+                }
+
                 next_spot.set(MAIN_CAMERA);
             }
         }

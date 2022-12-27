@@ -77,7 +77,7 @@ Blender is a good choice to create GLTF scenes, but you must make sure you confi
 
 ## License
 
-bevy_adventure is dual-licensed under MIT and Apache-2.0.
+`bevy_adventure` is dual-licensed under MIT and Apache-2.0.
 
 ## Compatibility
 
@@ -93,8 +93,6 @@ NOTE: We do not track Bevy main.
 [img_license]: https://img.shields.io/badge/license-MIT%2FApache-blue.svg
 [img_downloads]:https://img.shields.io/crates/d/bevy_adventure.svg
 [img_tracking]: https://img.shields.io/badge/Bevy%20tracking-released%20version-lightblue
-
-[img_preview]: https://raw.githubusercontent.com/hankjordan/bevy_adventure/master/examples/preview.mp4
 
 [bevy]: https://crates.io/crates/bevy/0.9.1
 [crates]: https://crates.io/crates/bevy_adventure

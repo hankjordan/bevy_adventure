@@ -23,6 +23,7 @@ use crate::{
         IsCameraSpot,
     },
     interactives::interactive,
+    AudioServer,
     CurrentSpot,
     Interactive,
     MAIN_CAMERA,
@@ -164,6 +165,9 @@ pub trait Scene {
 
     /// An optional setup method that allows you to register animations by name.
     fn animations(server: &mut AnimationServer) {}
+
+    /// An optional setup method that allows you to register audio sources by name.
+    fn audio(server: &mut AudioServer) {}
 
     /// An optional setup method that allows you to modify the App when adding the Scene.
     fn setup(app: &mut App) {}
