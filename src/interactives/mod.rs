@@ -17,6 +17,8 @@ pub use simple::{
     Description,
     MoveTo,
     Portal,
+    Prop,
+    Trigger,
 };
 pub use system::interactive;
 pub use util::ItemRef;

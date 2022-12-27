@@ -1,7 +1,4 @@
-use std::{
-    collections::HashMap,
-    marker::PhantomData,
-};
+use std::collections::HashMap;
 
 use bevy::{
     ecs::system::SystemParam,
@@ -67,10 +64,10 @@ impl AnimationRegistry {
 #[derive(SystemParam)]
 pub struct AnimationServer<'w, 's> {
     asset_server: Res<'w, AssetServer>,
+    assets: Res<'w, Assets<AnimationClip>>,
     registry: ResMut<'w, AnimationRegistry>,
 
-    #[system_param(ignore)]
-    marker: PhantomData<&'s ()>,
+    players: Query<'w, 's, (&'static Name, &'static mut AnimationPlayer)>,
 }
 
 impl<'w, 's> AnimationServer<'w, 's> {
@@ -95,5 +92,25 @@ impl<'w, 's> AnimationServer<'w, 's> {
     /// Returns a handle to a loaded `AnimationClip` given a name.
     pub fn get(&self, name: &str) -> Option<Handle<AnimationClip>> {
         self.registry.get(name)
+    }
+
+    /// Play an animation with the associated `AnimationPlayer`
+    pub fn play(&mut self, name: &str) {
+        if let Some(handle) = self.get(name) {
+            if let Some(animation) = self.assets.get(&handle) {
+                let mut names = Vec::new();
+
+                for (path, _) in animation.curves() {
+                    names.extend(&path.parts);
+                }
+
+                for (name, mut player) in &mut self.players {
+                    if names.contains(&name) {
+                        player.play(handle.clone());
+                        break;
+                    }
+                }
+            }
+        }
     }
 }

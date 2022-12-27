@@ -84,3 +84,35 @@ where
         Action::Transition(self.state.clone()).single()
     }
 }
+
+/// A preset Interactive that does nothing when interacted with.
+///
+/// Alias of `Trigger`.
+///
+/// Useful for creating objects that are just for looking at.
+#[derive(Component)]
+pub struct Prop;
+
+impl Interactive for Prop {
+    type State = NoState;
+
+    fn interact(&mut self, _state: &mut ResMut<WorldState>) -> Vec<Action<Self::State>> {
+        vec![]
+    }
+}
+
+/// A preset Interactive that does nothing when interacted with.
+///
+/// Alias of `Prop`.
+///
+/// Useful for creating camera triggers.
+#[derive(Component)]
+pub struct Trigger;
+
+impl Interactive for Trigger {
+    type State = NoState;
+
+    fn interact(&mut self, _state: &mut ResMut<WorldState>) -> Vec<Action<Self::State>> {
+        vec![]
+    }
+}

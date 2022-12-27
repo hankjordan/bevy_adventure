@@ -38,7 +38,6 @@ use crate::{
 pub struct InteractiveQuery<'w, 's, T: Interactive + Component + 'static> {
     back_spot: Query<'w, 's, &'static BackToSpot>,
     back_state: Query<'w, 's, &'static BackToState<T::State>>,
-    players: Query<'w, 's, &'static mut AnimationPlayer>,
     interactives: Query<'w, 's, &'static mut T>,
 }
 
@@ -47,9 +46,9 @@ pub struct InteractiveQuery<'w, 's, T: Interactive + Component + 'static> {
 pub fn interactive<T: Interactive + Component>(
     mut commands: CommandsExt,
     mut display: TextDisplay,
-    spots: CameraSpots,
-    animation_server: AnimationServer,
+    mut animation_server: AnimationServer,
     audio_server: AudioServer,
+    spots: CameraSpots,
 
     input: Res<Input<MouseButton>>,
     cursor: Res<Cursor>,
@@ -96,11 +95,7 @@ pub fn interactive<T: Interactive + Component>(
                                 inventory.items.insert(name);
                             }
                             Action::Animation(name) => {
-                                for mut player in &mut query.players {
-                                    if let Some(animation) = animation_server.get(&name) {
-                                        player.play(animation);
-                                    }
-                                }
+                                animation_server.play(&name);
                             }
                             Action::Audio(name) => {
                                 audio_server.play(&name);

@@ -15,6 +15,8 @@ use crate::interactives::{
         Description,
         MoveTo,
         Portal,
+        Prop,
+        Trigger,
     },
 };
 
@@ -36,6 +38,8 @@ where S: StateData {
             .add_system(interactive::<Description>)
             .add_system(interactive::<MoveTo>)
             .add_system(interactive::<Portal<S>>)
+            .add_system(interactive::<Prop>)
+            .add_system(interactive::<Trigger>)
             
             .add_system_to_stage(CoreStage::PreUpdate, hovering_raycast);
     }

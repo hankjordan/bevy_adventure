@@ -42,6 +42,8 @@ pub use crate::{
         ItemRef,
         MoveTo,
         Portal,
+        Prop,
+        Trigger,
     },
     inventory::{
         DraggingItem,
