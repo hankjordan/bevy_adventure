@@ -22,7 +22,11 @@ use crate::{
         CameraSpot,
         IsCameraSpot,
     },
-    interactives::interactive,
+    interactives::{
+        interactive,
+        prepare_interaction,
+        reset_interaction,
+    },
     AudioServer,
     CurrentSpot,
     Interactive,
@@ -178,6 +182,9 @@ pub trait Scene {
 
 /// Extension trait that adds Scene-related methods to Bevy's `App`.
 pub trait AppSceneStateExt {
+    /// Add a `State` to the app.
+    fn add_adventure_state<T: StateData>(&mut self, init: T) -> &mut App;
+
     /// Add a Scene to the app.
     ///
     /// Calls the Scene's setup method.
@@ -191,10 +198,17 @@ pub trait AppSceneStateExt {
 }
 
 impl AppSceneStateExt for App {
+    fn add_adventure_state<T: StateData>(&mut self, init: T) -> &mut App {
+        self ////
+            .add_loopless_state_after_stage(CoreStage::Update, init)
+    }
+
     fn add_scene<S: Scene + 'static>(&mut self) -> &mut App {
         S::setup(self);
 
         self ////
+            .add_system_to_stage(CoreStage::First, reset_interaction)
+            .add_system_to_stage(CoreStage::PreUpdate, prepare_interaction::<S::State>)
             .add_enter_system(S::state(), spawn_scene::<S>)
             .add_exit_system(S::state(), cleanup_scene)
     }

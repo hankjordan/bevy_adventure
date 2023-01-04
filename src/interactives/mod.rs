@@ -1,9 +1,9 @@
 mod actions;
 mod hovering;
+mod interact;
 mod plugin;
 mod ray;
 mod simple;
-mod system;
 mod util;
 
 pub use actions::{
@@ -12,6 +12,12 @@ pub use actions::{
     Interactive,
 };
 pub use hovering::Hovering;
+pub use interact::{
+    interactive,
+    prepare_interaction,
+    reset_interaction,
+    Interaction,
+};
 pub use plugin::InteractivesPlugin;
 pub use simple::{
     Description,
@@ -20,5 +26,4 @@ pub use simple::{
     Prop,
     Trigger,
 };
-pub use system::interactive;
 pub use util::ItemRef;

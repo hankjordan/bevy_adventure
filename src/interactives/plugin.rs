@@ -18,6 +18,7 @@ use crate::interactives::{
         Prop,
         Trigger,
     },
+    Interaction,
 };
 
 pub struct InteractivesPlugin<S>(PhantomData<S>);
@@ -34,6 +35,7 @@ where S: StateData {
     fn build(&self, app: &mut App) {
         app
             .init_resource::<Hovering>()
+            .init_resource::<Interaction>()
 
             .add_system(interactive::<Description>)
             .add_system(interactive::<MoveTo>)

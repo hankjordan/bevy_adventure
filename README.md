@@ -85,7 +85,7 @@ NOTE: We do not track Bevy main.
 
 |Bevy Version|Crate Version      |
 |------------|-------------------|
-|`0.9`       |`0.1`              |
+|`0.9`       |`0.1`, `0.2`       |
 
 [img_bevy]: https://img.shields.io/badge/Bevy-0.9-blue
 [img_version]: https://img.shields.io/crates/v/bevy_adventure.svg

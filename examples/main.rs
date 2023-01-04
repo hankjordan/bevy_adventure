@@ -12,18 +12,16 @@ use bevy_adventure::{
     AppSceneStateExt,
     CommandsExt,
     Description,
-    Ignores,
     Interactive,
     Item,
     Message,
-    MoveTo,
     NewMessage,
     Portal,
     Scene,
+    Trigger,
     WorldState,
 };
 use bevy_rapier3d::prelude::*;
-use iyes_loopless::prelude::AppLooplessStateExt;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum GameState {
@@ -66,17 +64,18 @@ impl Scene for BathroomScene {
         const CUP: &str = "Cup";
         const DOOR: &str = "Door";
         const SINK: &str = "Sink";
-        const SINK_CAMERA: &str = "Camera_Sink";
 
         match entity.get::<Name>().map(|t| t.as_str()) {
-            Some(SINK_CAMERA) => commands.insert(Ignores::single(SINK)),
             Some(CUP) => commands.insert(Collider::cuboid(0.1, 0.1, 0.1)).insert(Cup),
             Some(DOOR) => commands
                 .insert(Collider::cuboid(0.1, 0.5, 1.1))
                 .insert(Portal::new(GameState::Hallway)),
+
+            // Creating a Trigger will make the Interactive act as though it isn't there, but only when focused.
+            // In this scene, focusing on the sink allows the player to interact with the Cup.
             Some(SINK) => commands
                 .insert(Collider::cuboid(0.5, 0.5, 0.7))
-                .insert(MoveTo::new(SINK_CAMERA)),
+                .insert(Trigger::new(SINK)),
 
             _ => commands,
         };
@@ -295,7 +294,9 @@ fn main() {
         ////
         .add_plugin(AdventurePlugin::<GameState>::default())
         ////
-        .add_loopless_state(GameState::Bathroom)
+        // Important: register state via `add_adventure_state` instead of `add_loopless_state`
+        // This allows NextSpot to work between Scenes (Requires `SystemTransitionStage` to run after `CoreStage::Update`)
+        .add_adventure_state(GameState::Bathroom)
         ////
         .add_scene::<BathroomScene>()
         .add_scene::<BedroomScene>()

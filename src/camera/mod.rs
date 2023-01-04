@@ -9,7 +9,10 @@ pub use back::{
     BackToState,
 };
 pub use ignores::Ignores;
-pub use next::NextSpot;
+pub use next::{
+    NextSpot,
+    SkipAnimation,
+};
 pub use plugin::CameraPlugin;
 pub use spot::{
     CameraSpot,

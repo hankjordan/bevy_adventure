@@ -31,6 +31,9 @@ pub enum Action<State> {
 
     /// Move to a CameraSpot with the given name.
     Move(String),
+
+    /// Jump to a CameraSpot with the given name, skipping animation.
+    Jump(String),
 }
 
 impl<State> Action<State> {

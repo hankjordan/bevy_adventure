@@ -2,7 +2,10 @@ use bevy::prelude::*;
 use bevy_rapier3d::prelude::*;
 
 use crate::{
-    interactives::ray::Ray3d,
+    interactives::{
+        interact::LookingAt,
+        ray::Ray3d,
+    },
     CommandsExt,
     CurrentSpot,
     Cursor,
@@ -19,12 +22,14 @@ pub struct Hovering {
 }
 
 #[allow(clippy::needless_pass_by_value)]
+#[allow(clippy::too_many_arguments)]
 pub fn hovering_raycast(
     commands: CommandsExt,
 
     ctx: Res<RapierContext>,
     cursor: Res<Cursor>,
     at_spot: Res<CurrentSpot>,
+    looking_at: Option<Res<LookingAt>>,
 
     mut hovering: ResMut<Hovering>,
 
@@ -35,6 +40,12 @@ pub fn hovering_raycast(
         let ray = Ray3d::from_screenspace(cursor.position(), camera, gtf).unwrap();
 
         let mut ignores = Vec::new();
+
+        if let Some(looking_at) = looking_at {
+            if let Ok(ignored) = ignore.get(looking_at.0) {
+                ignores.extend(commands.named_any(&ignored.names));
+            }
+        }
 
         if let Ok(ignored) = ignore.get(at_spot.get().entity()) {
             ignores.extend(commands.named_any(&ignored.names));
