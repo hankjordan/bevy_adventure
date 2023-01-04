@@ -92,13 +92,12 @@ pub struct LookingAt(pub Entity);
 #[allow(clippy::collapsible_if)]
 pub fn prepare_interaction<T: StateData>(
     mut commands: Commands,
+    spots: CameraSpots,
 
     input: Res<Input<MouseButton>>,
     cursor: Res<Cursor>,
 
     mut interaction: ResMut<Interaction>,
-
-    looking_at: Option<Res<LookingAt>>,
 
     dragging: Res<DraggingItem>,
     at_spot: ResMut<CurrentSpot>,
@@ -117,8 +116,8 @@ pub fn prepare_interaction<T: StateData>(
 
                 if let Ok(spot) = back_spot.get(at_spot.get().entity()) {
                     back = Some(spot);
-                } else if let Some(looking_at) = looking_at {
-                    if let Ok(spot) = back_spot.get(looking_at.0) {
+                } else if let Some(looking_at) = spots.for_spot(at_spot.get()) {
+                    if let Ok(spot) = back_spot.get(looking_at) {
                         back = Some(spot);
                     }
                 }

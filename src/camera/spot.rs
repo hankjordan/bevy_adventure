@@ -94,7 +94,7 @@ pub struct IsCameraSpot;
 /// `SystemParam` for retrieving `CameraSpots` for entities or from names.
 #[derive(SystemParam)]
 pub struct CameraSpots<'w, 's> {
-    named: Query<'w, 's, &'static Name, Without<IsCameraSpot>>,
+    named: Query<'w, 's, (Entity, &'static Name), Without<IsCameraSpot>>,
     spots: Query<'w, 's, (Entity, &'static Name, &'static GlobalTransform), With<IsCameraSpot>>,
 }
 
@@ -114,8 +114,21 @@ impl<'w, 's> CameraSpots<'w, 's> {
     ///
     /// Only works if the name of the `CameraSpot` matches `Camera_ENTITY_NAME`
     pub fn for_interactive(&self, entity: Entity) -> Option<CameraSpot> {
-        if let Ok(name) = self.named.get(entity) {
+        if let Ok((_, name)) = self.named.get(entity) {
             return self.get(format! {"Camera_{name}"}.as_str());
+        }
+
+        None
+    }
+
+    /// Given a `CameraSpot`, retrieve the associated `Interactive` entity.
+    pub fn for_spot(&self, spot: &CameraSpot) -> Option<Entity> {
+        if let Some((_, target)) = spot.name().split_once("Camera_") {
+            for (entity, name) in &self.named {
+                if name.as_str() == target {
+                    return Some(entity);
+                }
+            }
         }
 
         None

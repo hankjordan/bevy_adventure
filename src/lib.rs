@@ -29,7 +29,7 @@ pub use crate::{
         CurrentSpot,
         Ignores,
         NextSpot,
-        SkipAnimation
+        SkipAnimation,
     },
     commands::CommandsExt,
     constants::MAIN_CAMERA,
