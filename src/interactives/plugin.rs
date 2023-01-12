@@ -12,10 +12,9 @@ use crate::interactives::{
     },
     interactive,
     simple::{
-        Description,
-        MoveTo,
-        Portal,
+        NoState,
         Prop,
+        Simple,
         Trigger,
     },
     Interaction,
@@ -37,9 +36,9 @@ where S: StateData {
             .init_resource::<Hovering>()
             .init_resource::<Interaction>()
 
-            .add_system(interactive::<Description>)
-            .add_system(interactive::<MoveTo>)
-            .add_system(interactive::<Portal<S>>)
+            .add_system(interactive::<Simple<NoState>>)
+            .add_system(interactive::<Simple<S>>)
+            
             .add_system(interactive::<Prop>)
             .add_system(interactive::<Trigger>)
             

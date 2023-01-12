@@ -1,6 +1,17 @@
 use bevy::{
-    ecs::system::SystemParam,
+    ecs::{
+        schedule::StateData,
+        system::{
+            EntityCommands,
+            SystemParam,
+        },
+    },
     prelude::*,
+};
+
+use crate::{
+    Action,
+    Simple,
 };
 
 /// `SystemParam` that acts as an extension to `Commands` for working with named entities.
@@ -85,5 +96,17 @@ impl<'w, 's> std::ops::Deref for CommandsExt<'w, 's> {
 impl<'w, 's> std::ops::DerefMut for CommandsExt<'w, 's> {
     fn deref_mut(&mut self) -> &mut Self::Target {
         &mut self.commands
+    }
+}
+
+/// Extension trait that adds Action-related methods to Bevy's `EntityCommands`.
+pub trait CommandsActionsExt {
+    /// Insert a `SimpleInteractive` `Component` that runs the given actions when interacted with.
+    fn actions<State: StateData>(&mut self, actions: Vec<Action<State>>) -> &mut Self;
+}
+
+impl<'w, 's, 'a> CommandsActionsExt for EntityCommands<'w, 's, 'a> {
+    fn actions<State: StateData>(&mut self, actions: Vec<Action<State>>) -> &mut Self {
+        self.insert(Simple::from(actions))
     }
 }

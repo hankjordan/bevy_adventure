@@ -16,91 +16,101 @@ use crate::{
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct NoState;
 
-/// A preset `Interactive` that displays a message when interacted with.
+/// An `Interactive` that just runs the given actions when interacted with.
 #[derive(Component)]
-pub struct Description {
-    text: String,
+pub struct Simple<State> {
+    actions: Vec<Action<State>>,
 }
 
-impl Description {
-    /// Returns a new instance of `Description` with the given text.
-    pub fn new(text: &str) -> Self {
-        Self {
-            text: text.to_owned(),
-        }
-    }
-}
-
-impl Interactive for Description {
-    type State = NoState;
-
-    fn interact(&mut self, _state: &mut ResMut<WorldState>) -> Vec<Action<Self::State>> {
-        Action::Message(Message::new(&self.text)).single()
-    }
-}
-
-/// A preset `Interactive` that moves to a `CameraSpot` when interacted with.
-#[derive(Component)]
-pub struct MoveTo {
-    spot: String,
-}
-
-impl MoveTo {
-    /// Returns a new instance of `MoveTo` with the given spot name.
-    pub fn new(spot: &str) -> Self {
-        Self {
-            spot: spot.to_owned(),
-        }
-    }
-}
-
-impl Interactive for MoveTo {
-    type State = NoState;
-
-    fn interact(&mut self, _state: &mut ResMut<WorldState>) -> Vec<Action<Self::State>> {
-        Action::Move(self.spot.clone()).single()
-    }
-}
-
-/// A preset `Interactive` that changes the current state when interacted with.
-#[derive(Component)]
-pub struct Portal<T> {
-    state: T,
-    spot: Option<String>,
-}
-
-impl<T> Portal<T> {
-    /// Returns a new instance of `Portal` with the given state.
-    pub fn new(state: T) -> Self {
-        Self { state, spot: None }
+impl<State> Simple<State> {
+    /// Add an `Action` to the `Simple`.
+    pub fn push(&mut self, action: Action<State>) -> &mut Self {
+        self.actions.push(action);
+        self
     }
 
-    /// Set the `NextSpot` when activating the `Portal`.
+    /// Add a `Vec` of Actions to the `Simple`.
+    pub fn extend(&mut self, actions: Vec<Action<State>>) -> &mut Self {
+        self.actions.extend(actions);
+        self
+    }
+
+    /// Add an `Action::Animation` action to the `Simple`.
     #[must_use]
-    pub fn spot(mut self, name: &str) -> Self {
-        self.spot = Some(name.to_owned());
+    pub fn animation(mut self, name: &str) -> Self {
+        self.push(Action::Animation(name.to_owned()));
+        self
+    }
+
+    /// Add an `Action::Audio` action to the `Simple`.
+    #[must_use]
+    pub fn audio(mut self, name: &str) -> Self {
+        self.push(Action::Audio(name.to_owned()));
+        self
+    }
+
+    /// Add an `Action::Jump` action to the `Simple`.
+    #[must_use]
+    pub fn jump(mut self, name: &str) -> Self {
+        self.push(Action::Jump(name.to_owned()));
         self
     }
 }
 
-impl<T> Interactive for Portal<T>
-where
-    T: StateData,
-{
-    type State = T;
-
-    fn interact(&mut self, _state: &mut ResMut<WorldState>) -> Vec<Action<Self::State>> {
-        let mut actions = Action::Transition(self.state.clone()).single();
-
-        if let Some(spot) = &self.spot {
-            actions.push(Action::Jump(spot.clone()));
-        }
-
-        actions
+impl<State> From<Vec<Action<State>>> for Simple<State> {
+    fn from(actions: Vec<Action<State>>) -> Self {
+        Self { actions }
     }
 }
 
-/// A preset Interactive that does nothing when interacted with.
+impl<State> From<Action<State>> for Simple<State> {
+    fn from(action: Action<State>) -> Self {
+        <Vec<Action<State>>>::from(action).into()
+    }
+}
+
+impl<State> Interactive for Simple<State>
+where
+    State: StateData,
+{
+    type State = State;
+
+    fn interact(&mut self, _: &mut ResMut<WorldState>) -> Vec<Action<Self::State>> {
+        self.actions.clone()
+    }
+}
+
+/// A preset `Interactive` that displays a message when interacted with.
+pub struct Description;
+
+impl Description {
+    /// Returns a new instance of `Simple` that will send a message with the given text when interacted with.
+    pub fn build(text: &str) -> Simple<NoState> {
+        Action::Message(Message::new(text)).into()
+    }
+}
+
+/// A preset `Interactive` that moves to a `CameraSpot` when interacted with.
+pub struct MoveTo;
+
+impl MoveTo {
+    /// Returns a new instance of `Simple` that will move the camera to the given spot when interacted with.
+    pub fn build(spot: &str) -> Simple<NoState> {
+        Action::Move(spot.to_owned()).into()
+    }
+}
+
+/// A preset `Interactive` that changes the current state when interacted with.
+pub struct Portal;
+
+impl Portal {
+    /// Returns a new instance of `Simple` that will change the current state when interacted with.
+    pub fn build<State>(state: State) -> Simple<State> {
+        Action::Transition(state).into()
+    }
+}
+
+/// A preset `Interactive` that does nothing when interacted with.
 ///
 /// Useful for creating objects that are just for looking at.
 #[derive(Component)]
@@ -114,15 +124,15 @@ impl Interactive for Prop {
     }
 }
 
-/// A preset Interactive that does nothing when interacted with.
+/// A preset `Interactive` that does nothing when interacted with.
 ///
 /// Useful for creating camera triggers, prevents interacting with objects behind it until it is focused.
 #[derive(Component)]
 pub struct Trigger;
 
 impl Trigger {
-    /// Create a new bundle, with `Ignores` set up to ignore the passed name, and the `Trigger` `Interactive`.
-    pub fn new(name: &str) -> (Ignores, Self) {
+    /// Create a new `Bundle`, with `Ignores` set up to ignore the passed name, and the `Trigger` `Interactive`.
+    pub fn build(name: &str) -> (Ignores, Self) {
         (Ignores::single(name), Self)
     }
 }

@@ -227,8 +227,13 @@ impl AppSceneStateExt for App {
     }
 }
 
-fn spawn_scene<S: Scene + 'static>(mut manager: SceneManager, mut server: AnimationServer) {
-    S::animations(&mut server);
+fn spawn_scene<S: Scene + 'static>(
+    mut manager: SceneManager,
+    mut animation_server: AnimationServer,
+    mut audio_server: AudioServer,
+) {
+    S::animations(&mut animation_server);
+    S::audio(&mut audio_server);
     manager.spawn(S::scene(), S::spawn);
 }
 

@@ -24,6 +24,7 @@ pub use simple::{
     MoveTo,
     Portal,
     Prop,
+    Simple,
     Trigger,
 };
 pub use util::ItemRef;

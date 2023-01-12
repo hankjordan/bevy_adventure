@@ -31,7 +31,10 @@ pub use crate::{
         NextSpot,
         SkipAnimation,
     },
-    commands::CommandsExt,
+    commands::{
+        CommandsActionsExt,
+        CommandsExt,
+    },
     constants::MAIN_CAMERA,
     cursor::Cursor,
     interactives::{
@@ -44,6 +47,7 @@ pub use crate::{
         MoveTo,
         Portal,
         Prop,
+        Simple,
         Trigger,
     },
     inventory::{
