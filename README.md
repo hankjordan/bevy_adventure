@@ -3,7 +3,9 @@
 
 A framework for building 3d adventure games in Bevy.
 
-<https://user-images.githubusercontent.com/29737477/209001156-8c4916dd-327c-4e4f-aa22-9c2676a8134d.mp4>
+
+<https://user-images.githubusercontent.com/29737477/212168485-6497dfdf-cfa6-406a-814b-8a6598e20152.mp4>
+
 
 ## Features
 
