@@ -85,9 +85,9 @@ Blender is a good choice to create GLTF scenes, but you must make sure you confi
 
 NOTE: We do not track Bevy main.
 
-|Bevy Version|Crate Version          |
-|------------|-----------------------|
-|`0.9`       |`0.1`, `0.2`, `0.3`    |
+|Bevy Version|Crate Version              |
+|------------|---------------------------|
+|`0.9`       |`0.1`, `0.2`, `0.3`, `0.4` |
 
 [img_bevy]: https://img.shields.io/badge/Bevy-0.9-blue
 [img_version]: https://img.shields.io/crates/v/bevy_adventure.svg
