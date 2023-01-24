@@ -8,7 +8,6 @@ use bevy::{
 use iyes_loopless::state::NextState;
 
 use crate::{
-    audio::AudioServer,
     camera::{
         BackToSpot,
         BackToState,
@@ -33,7 +32,6 @@ use crate::{
         Message,
         TextDisplay,
     },
-    AnimationServer,
     Cursor,
     MAIN_CAMERA,
 };
@@ -165,8 +163,6 @@ impl<'w, 's, T: Interactive + Component + 'static> Interactives<'w, 's, T> {
 pub fn interactive<T: Interactive + Component>(
     mut commands: CommandsExt,
     mut display: TextDisplay,
-    mut animation_server: AnimationServer,
-    audio_server: AudioServer,
     spots: CameraSpots,
 
     dragging: Res<DraggingItem>,
@@ -209,10 +205,10 @@ pub fn interactive<T: Interactive + Component>(
                         inventory.items.insert(name);
                     }
                     Action::Animation(name) => {
-                        animation_server.play(&name);
+                        commands.play_animation(&name);
                     }
                     Action::Audio(name) => {
-                        audio_server.play(&name);
+                        commands.play_audio(&name);
                     }
                     Action::Message(text) => display.show(text),
                     Action::Transition(state) => {

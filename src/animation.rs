@@ -14,8 +14,10 @@ impl Plugin for AnimationPlugin {
     fn build(&self, app: &mut App) {
         app
             .insert_resource(AnimationRegistry::default())
+            .insert_resource(AnimationQueue::default())
             
-            .add_system(tween_transforms);
+            .add_system(tween_transforms)
+            .add_system(play_animations);
     }
 }
 
@@ -60,6 +62,74 @@ impl AnimationRegistry {
     }
 }
 
+#[derive(Resource, Debug, Default)]
+pub struct AnimationQueue {
+    queued: HashMap<Entity, Vec<Handle<AnimationClip>>>,
+    playing: HashMap<Entity, Handle<AnimationClip>>,
+}
+
+impl AnimationQueue {
+    pub fn push(&mut self, entity: Entity, handle: Handle<AnimationClip>) {
+        let entry = self.queued.entry(entity).or_default();
+        entry.push(handle);
+    }
+
+    pub fn pop(&mut self, entity: Entity) -> Option<Handle<AnimationClip>> {
+        if let Some(entry) = self.queued.get_mut(&entity) {
+            if let Some(handle) = entry.pop() {
+                return Some(handle);
+            } else {
+                self.queued.remove(&entity);
+            }
+        }
+
+        None
+    }
+
+    pub fn keys(&self) -> impl Iterator<Item = Entity> + '_ {
+        self.queued.keys().map(|i| *i)
+    }
+}
+
+fn play_animations(
+    clips: Res<Assets<AnimationClip>>,
+    mut queue: ResMut<AnimationQueue>,
+    mut players: Query<&mut AnimationPlayer>,
+) {
+    let mut remove = Vec::new();
+
+    for (entity, handle) in queue.playing.iter() {
+        if let Ok(player) = players.get(*entity) {
+            if let Some(clip) = clips.get(handle) {
+                if player.elapsed() > clip.duration() {
+                    remove.push(*entity);
+                }
+            } else {
+                remove.push(*entity);
+            }
+        } else {
+            remove.push(*entity);
+        }
+    }
+
+    for entity in remove {
+        queue.playing.remove(&entity);
+    }
+
+    let targets = queue.keys().collect::<Vec<_>>();
+
+    for entity in targets {
+        if let Ok(mut player) = players.get_mut(entity) {
+            if !queue.playing.contains_key(&entity) {
+                if let Some(next) = queue.pop(entity) {
+                    queue.playing.insert(entity, next.clone());
+                    player.play(next);
+                }
+            }
+        }
+    }
+}
+
 /// `SystemParam` for registering named Animations.
 #[derive(SystemParam)]
 pub struct AnimationServer<'w, 's> {
@@ -67,7 +137,9 @@ pub struct AnimationServer<'w, 's> {
     assets: Res<'w, Assets<AnimationClip>>,
     registry: ResMut<'w, AnimationRegistry>,
 
-    players: Query<'w, 's, (&'static Name, &'static mut AnimationPlayer)>,
+    queue: ResMut<'w, AnimationQueue>,
+
+    players: Query<'w, 's, (Entity, &'static Name), With<AnimationPlayer>>,
 }
 
 impl<'w, 's> AnimationServer<'w, 's> {
@@ -104,9 +176,9 @@ impl<'w, 's> AnimationServer<'w, 's> {
                     names.extend(&path.parts);
                 }
 
-                for (name, mut player) in &mut self.players {
+                for (entity, name) in &self.players {
                     if names.contains(&name) {
-                        player.play(handle.clone());
+                        self.queue.push(entity, handle);
                         break;
                     }
                 }

@@ -11,13 +11,17 @@ use bevy::{
 
 use crate::{
     Action,
-    Simple,
+    Simple, AnimationServer, AudioServer,
 };
 
 /// `SystemParam` that acts as an extension to `Commands` for working with named entities.
 #[derive(SystemParam)]
 pub struct CommandsExt<'w, 's> {
     commands: Commands<'w, 's>,
+
+    animation_server: AnimationServer<'w, 's>,
+    audio_server: AudioServer<'w, 's>,
+    
     query: Query<'w, 's, (Entity, &'static Name)>,
     visibility: Query<'w, 's, &'static mut Visibility>,
 }
@@ -82,6 +86,16 @@ impl<'w, 's> CommandsExt<'w, 's> {
                 visibility.is_visible = false;
             }
         }
+    }
+
+    /// Play a named animation on the [`AnimationServer`]
+    pub fn play_animation(&mut self, name: &str) {
+        self.animation_server.play(name);
+    }
+
+    /// Play a named audio clip on the [`AudioServer`]
+    pub fn play_audio(&self, name: &str) {
+        self.audio_server.play(name);
     }
 }
 
