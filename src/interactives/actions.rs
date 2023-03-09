@@ -1,5 +1,4 @@
 use bevy::{
-    ecs::schedule::StateData,
     prelude::*,
 };
 
@@ -83,7 +82,7 @@ pub fn invalid_item_used<T>() -> Vec<Action<T>> {
 pub trait Interactive {
     /// The type of the state that the interactive is a part of.
     /// Must match the Scene's state type for the Interactive to be registered properly.
-    type State: StateData;
+    type State: States;
 
     /// Optional method called whenever an item is used on an object.
     ///

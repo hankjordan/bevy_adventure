@@ -1,7 +1,7 @@
 use std::marker::PhantomData;
 
 use bevy::{
-    ecs::schedule::StateData,
+    ecs::schedule::States,
     prelude::*,
 };
 
@@ -17,21 +17,21 @@ use crate::{
     textdisplay::TextDisplayPlugin,
 };
 
-/// The main plugin that must be added to your app with `add_plugin`.
+/// The main plugin that must be added to your app with `App::add_plugin`.
 ///
-/// The generic parameter `State` should be the `StateData` for your game,
+/// The generic parameter `S` should be the [`States`] for your game,
 /// usually an enum containing all of the different possible states.
-pub struct AdventurePlugin<State>(PhantomData<State>);
+pub struct AdventurePlugin<S>(PhantomData<S>);
 
-impl<State> Default for AdventurePlugin<State> {
+impl<S> Default for AdventurePlugin<S> {
     fn default() -> Self {
         Self(PhantomData::default())
     }
 }
 
-impl<State> Plugin for AdventurePlugin<State>
+impl<S> Plugin for AdventurePlugin<S>
 where
-    State: StateData,
+    S: States,
 {
     fn build(&self, app: &mut App) {
         app ////
@@ -39,7 +39,7 @@ where
             .add_plugin(AudioPlugin)
             .add_plugin(CameraPlugin)
             .add_plugin(CursorPlugin)
-            .add_plugin(InteractivesPlugin::<State>::default())
+            .add_plugin(InteractivesPlugin::<S>::default())
             .add_plugin(InventoryPlugin)
             .add_plugin(SceneManagerPlugin)
             .add_plugin(TextDisplayPlugin)

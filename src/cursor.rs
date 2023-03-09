@@ -7,7 +7,7 @@ impl Plugin for CursorPlugin {
     fn build(&self, app: &mut App) {
         app
             .init_resource::<Cursor>()
-            .add_system_to_stage(CoreStage::First, update_cursor);
+            .add_system(update_cursor.in_base_set(CoreSet::First));
     }
 }
 
@@ -41,10 +41,15 @@ impl Cursor {
 }
 
 #[allow(clippy::needless_pass_by_value)]
-fn update_cursor(window: Res<Windows>, mut cursor: ResMut<Cursor>) {
-    if let Some(mouse) = window.primary().cursor_position() {
-        if mouse != cursor.last_position {
-            cursor.set(mouse);
+fn update_cursor(
+    mut cursor: ResMut<Cursor>,
+    windows: Query<&Window>,
+) {
+    for window in &windows {
+        if let Some(mouse) = window.cursor_position() {
+            if mouse != cursor.last_position {
+                cursor.set(mouse);
+            }
         }
     }
 }

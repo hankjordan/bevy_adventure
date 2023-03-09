@@ -1,7 +1,7 @@
 use bevy::{
     asset::AssetPath,
     ecs::{
-        schedule::StateData,
+        schedule::States,
         system::{
             EntityCommands,
             SystemParam,
@@ -11,7 +11,6 @@ use bevy::{
     prelude::*,
     scene::SceneInstance,
 };
-use iyes_loopless::prelude::*;
 
 use crate::{
     animation::{
@@ -159,7 +158,7 @@ impl<'w, 's> SceneManager<'w, 's> {
 #[allow(unused_variables)]
 pub trait Scene {
     /// The type of the state that the scene is a part of.
-    type State: StateData;
+    type State: States;
 
     /// The specific state the app will be in when this Scene is active.
     fn state() -> Self::State;
@@ -182,9 +181,6 @@ pub trait Scene {
 
 /// Extension trait that adds Scene-related methods to Bevy's `App`.
 pub trait AppSceneStateExt {
-    /// Add a `State` to the app.
-    fn add_adventure_state<T: StateData>(&mut self, init: T) -> &mut App;
-
     /// Add a Scene to the app.
     ///
     /// Calls the Scene's setup method.
@@ -198,19 +194,14 @@ pub trait AppSceneStateExt {
 }
 
 impl AppSceneStateExt for App {
-    fn add_adventure_state<T: StateData>(&mut self, init: T) -> &mut App {
-        self ////
-            .add_loopless_state_after_stage(CoreStage::Update, init)
-    }
-
     fn add_scene<S: Scene + 'static>(&mut self) -> &mut App {
         S::setup(self);
 
         self ////
-            .add_system_to_stage(CoreStage::First, reset_interaction)
-            .add_system_to_stage(CoreStage::PreUpdate, prepare_interaction::<S::State>)
-            .add_enter_system(S::state(), spawn_scene::<S>)
-            .add_exit_system(S::state(), cleanup_scene)
+            .add_system(reset_interaction.in_base_set(CoreSet::First))
+            .add_system(prepare_interaction::<S::State>.in_base_set(CoreSet::PreUpdate))
+            .add_system(spawn_scene::<S>.in_schedule(OnEnter(S::state())))
+            .add_system(cleanup_scene.in_schedule(OnExit(S::state())))
     }
 
     fn add_interactive<S, I>(&mut self) -> &mut App
@@ -218,12 +209,7 @@ impl AppSceneStateExt for App {
         S: Scene + 'static,
         I: Interactive + Component,
     {
-        self.add_system_set(
-            ConditionSet::new()
-                .run_in_state(S::state())
-                .with_system(interactive::<I>)
-                .into(),
-        )
+        self.add_system(interactive::<I>.run_if(in_state(S::state())))
     }
 }
 

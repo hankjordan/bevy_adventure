@@ -1,7 +1,7 @@
 use std::marker::PhantomData;
 
 use bevy::{
-    ecs::schedule::StateData,
+    ecs::schedule::States,
     prelude::*,
 };
 
@@ -30,7 +30,7 @@ impl<S> Default for InteractivesPlugin<S> {
 
 #[rustfmt::skip]
 impl<S> Plugin for InteractivesPlugin<S> 
-where S: StateData {
+where S: States {
     fn build(&self, app: &mut App) {
         app
             .init_resource::<Hovering>()
@@ -42,6 +42,6 @@ where S: StateData {
             .add_system(interactive::<Prop>)
             .add_system(interactive::<Trigger>)
             
-            .add_system_to_stage(CoreStage::PreUpdate, hovering_raycast);
+            .add_system(hovering_raycast.in_base_set(CoreSet::PreUpdate));
     }
 }

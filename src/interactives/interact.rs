@@ -1,11 +1,10 @@
 use bevy::{
     ecs::{
-        schedule::StateData,
+        schedule::States,
         system::SystemParam,
     },
     prelude::*,
 };
-use iyes_loopless::state::NextState;
 
 use crate::{
     camera::{
@@ -88,7 +87,7 @@ pub struct LookingAt(pub Entity);
 #[allow(clippy::needless_pass_by_value)]
 #[allow(clippy::too_many_arguments)]
 #[allow(clippy::collapsible_if)]
-pub fn prepare_interaction<T: StateData>(
+pub fn prepare_interaction<S: States>(
     mut commands: Commands,
     spots: CameraSpots,
 
@@ -101,7 +100,7 @@ pub fn prepare_interaction<T: StateData>(
     at_spot: ResMut<CurrentSpot>,
 
     back_spot: Query<&BackToSpot>,
-    back_state: Query<&BackToState<T>>,
+    back_state: Query<&BackToState<S>>,
 ) {
     if interaction.ready() {
         if input.just_released(MouseButton::Left) {
@@ -124,7 +123,7 @@ pub fn prepare_interaction<T: StateData>(
                     commands.insert_resource(NextSpot(spot.name.clone()));
                 } else {
                     if let Ok(back) = back_state.get(at_spot.get().entity()) {
-                        commands.insert_resource(NextState(back.state.clone()));
+                        commands.insert_resource(NextState(Some(back.state.clone())));
                     }
 
                     commands.insert_resource(NextSpot(MAIN_CAMERA.to_owned()));
@@ -137,14 +136,14 @@ pub fn prepare_interaction<T: StateData>(
 }
 
 #[derive(SystemParam)]
-pub struct Interactives<'w, 's, T: Interactive + Component + 'static> {
+pub struct Interactives<'w, 's, I: Interactive + Component + 'static> {
     interaction: ResMut<'w, Interaction>,
     hovering: Res<'w, Hovering>,
-    query: Query<'w, 's, &'static mut T>,
+    query: Query<'w, 's, &'static mut I>,
 }
 
-impl<'w, 's, T: Interactive + Component + 'static> Interactives<'w, 's, T> {
-    fn get(&mut self) -> Option<(Entity, Mut<T>)> {
+impl<'w, 's, I: Interactive + Component + 'static> Interactives<'w, 's, I> {
+    fn get(&mut self) -> Option<(Entity, Mut<I>)> {
         if self.interaction.ok() {
             if let Some(entity) = self.hovering.entity {
                 if let Ok(interactive) = self.query.get_mut(entity) {
@@ -160,7 +159,7 @@ impl<'w, 's, T: Interactive + Component + 'static> Interactives<'w, 's, T> {
 
 #[allow(clippy::too_many_arguments)]
 #[allow(clippy::needless_pass_by_value)]
-pub fn interactive<T: Interactive + Component>(
+pub fn interactive<I: Interactive + Component>(
     mut commands: CommandsExt,
     mut display: TextDisplay,
     spots: CameraSpots,
@@ -170,7 +169,7 @@ pub fn interactive<T: Interactive + Component>(
     mut state: ResMut<WorldState>,
     at_spot: ResMut<CurrentSpot>,
 
-    mut interactives: Interactives<T>,
+    mut interactives: Interactives<I>,
 ) {
     if let Some((entity, mut interactive)) = interactives.get() {
         let mut focused = true;
@@ -212,7 +211,7 @@ pub fn interactive<T: Interactive + Component>(
                     }
                     Action::Message(text) => display.show(text),
                     Action::Transition(state) => {
-                        commands.insert_resource(NextState(state));
+                        commands.insert_resource(NextState(Some(state)));
                     }
                     Action::Move(name) => commands.insert_resource(NextSpot(name)),
                     Action::Jump(name) => {

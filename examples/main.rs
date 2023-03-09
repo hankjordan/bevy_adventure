@@ -1,3 +1,5 @@
+#![allow(clippy::uninlined_format_args)]
+
 use bevy::{
     ecs::{
         system::EntityCommands,
@@ -24,9 +26,11 @@ use bevy_adventure::{
 };
 use bevy_rapier3d::prelude::*;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, States)]
 pub enum GameState {
     MainMenu,
+
+    #[default]
     Bathroom,
     Bedroom,
     Hallway,
@@ -352,7 +356,7 @@ fn main() {
         ////
         // Important: register state via `add_adventure_state` instead of `add_loopless_state`
         // This allows NextSpot to work between Scenes (Requires `SystemTransitionStage` to run after `CoreStage::Update`)
-        .add_adventure_state(GameState::Bathroom)
+        .add_state::<GameState>()
         ////
         .add_scene::<BathroomScene>()
         .add_scene::<BedroomScene>()

@@ -1,5 +1,5 @@
 use bevy::{
-    ecs::schedule::StateData,
+    ecs::schedule::States,
     prelude::*,
 };
 
@@ -13,8 +13,11 @@ use crate::{
     Ignores,
 };
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub struct NoState;
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, States)]
+pub enum NoState {
+    #[default]
+    State
+}
 
 /// An `Interactive` that just runs the given actions when interacted with.
 #[derive(Component)]
@@ -71,7 +74,7 @@ impl<State> From<Action<State>> for Simple<State> {
 
 impl<State> Interactive for Simple<State>
 where
-    State: StateData,
+    State: States,
 {
     type State = State;
 

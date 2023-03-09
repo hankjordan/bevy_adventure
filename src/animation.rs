@@ -78,19 +78,21 @@ impl AnimationQueue {
         if let Some(entry) = self.queued.get_mut(&entity) {
             if let Some(handle) = entry.pop() {
                 return Some(handle);
-            } else {
-                self.queued.remove(&entity);
             }
+
+            self.queued.remove(&entity);
         }
 
         None
     }
 
     pub fn keys(&self) -> impl Iterator<Item = Entity> + '_ {
-        self.queued.keys().map(|i| *i)
+        self.queued.keys().copied()
     }
 }
 
+#[allow(clippy::needless_pass_by_value)]
+#[allow(clippy::map_entry)]
 fn play_animations(
     clips: Res<Assets<AnimationClip>>,
     mut queue: ResMut<AnimationQueue>,
@@ -98,7 +100,7 @@ fn play_animations(
 ) {
     let mut remove = Vec::new();
 
-    for (entity, handle) in queue.playing.iter() {
+    for (entity, handle) in &queue.playing {
         if let Ok(player) = players.get(*entity) {
             if let Some(clip) = clips.get(handle) {
                 if player.elapsed() > clip.duration() {
@@ -169,12 +171,17 @@ impl<'w, 's> AnimationServer<'w, 's> {
     /// Play an animation with the associated `AnimationPlayer`
     pub fn play(&mut self, name: &str) {
         if let Some(handle) = self.get(name) {
-            if let Some(animation) = self.assets.get(&handle) {
-                let mut names = Vec::new();
+            if let Some(_animation) = self.assets.get(&handle) {
+                let names = Vec::new();
 
-                for (path, _) in animation.curves() {
-                    names.extend(&path.parts);
+                // TODO
+                /*
+                for curve in animation.curves() {
+                    for path in curve {
+                        names.extend(&path.parts);
+                    }
                 }
+                */
 
                 for (entity, name) in &self.players {
                     if names.contains(&name) {

@@ -1,6 +1,6 @@
 use bevy::{
     ecs::{
-        schedule::StateData,
+        schedule::States,
         system::{
             EntityCommands,
             SystemParam,
@@ -70,20 +70,20 @@ impl<'w, 's> CommandsExt<'w, 's> {
         }
     }
 
-    /// Set `Visibility.is_visible` to true for all entities with the given name.
+    /// Set `Visibility` to `Visiblity::Visible` for all entities with the given name.
     pub fn show_named(&mut self, target: &str) {
         for entity in self.named(target) {
             if let Ok(mut visibility) = self.visibility.get_mut(entity) {
-                visibility.is_visible = true;
+                *visibility = Visibility::Visible;
             }
         }
     }
 
-    /// Set `Visibility.is_visible` to false for all entities with the given name.
+    /// Set `Visibility` to `Visibility::Hidden` for all entities with the given name.
     pub fn hide_named(&mut self, target: &str) {
         for entity in self.named(target) {
             if let Ok(mut visibility) = self.visibility.get_mut(entity) {
-                visibility.is_visible = false;
+                *visibility = Visibility::Hidden;
             }
         }
     }
@@ -116,11 +116,11 @@ impl<'w, 's> std::ops::DerefMut for CommandsExt<'w, 's> {
 /// Extension trait that adds Action-related methods to Bevy's `EntityCommands`.
 pub trait CommandsActionsExt {
     /// Insert a `SimpleInteractive` `Component` that runs the given actions when interacted with.
-    fn actions<State: StateData>(&mut self, actions: Vec<Action<State>>) -> &mut Self;
+    fn actions<State: States>(&mut self, actions: Vec<Action<State>>) -> &mut Self;
 }
 
 impl<'w, 's, 'a> CommandsActionsExt for EntityCommands<'w, 's, 'a> {
-    fn actions<State: StateData>(&mut self, actions: Vec<Action<State>>) -> &mut Self {
+    fn actions<State: States>(&mut self, actions: Vec<Action<State>>) -> &mut Self {
         self.insert(Simple::from(actions))
     }
 }

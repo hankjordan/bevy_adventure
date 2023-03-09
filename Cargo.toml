@@ -1,6 +1,6 @@
 [package]
 name = "bevy_adventure"
-version = "0.4.0"
+version = "0.5.0"
 edition = "2021"
 description = "A framework for building adventure games in Bevy."
 license = "MIT OR Apache-2.0"
@@ -12,10 +12,9 @@ default = []
 serde = ["dep:serde"]
 
 [dev-dependencies]
-bevy = { version = "0.9", features = ["jpeg"] }
+bevy = { version = "0.10", features = ["jpeg"] }
 
 [dependencies]
-bevy = { version = "0.9", default-features = false, features = ["animation", "bevy_audio"] }
-bevy_rapier3d = "0.19"
-iyes_loopless = "0.9"
+bevy = { version = "0.10", default-features = false, features = ["animation", "bevy_audio"] }
+bevy_rapier3d = "0.21"
 serde = { version = "1.0", optional = true }

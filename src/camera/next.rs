@@ -16,7 +16,7 @@ pub struct NextPlugin;
 impl Plugin for NextPlugin {
     fn build(&self, app: &mut App) {
         app
-            .add_system_to_stage(CoreStage::Last, handle_next_spot);
+            .add_system(handle_next_spot.in_base_set(CoreSet::Last));
     }
 }
 
@@ -60,9 +60,10 @@ fn handle_next_spot(world: &mut World) {
                 world.insert_resource(CurrentSpot::new(spot));
             }
         } else {
-            for entity in world.iter_entities() {
+            for entity in world.iter_entities().map(|e| e.id()) {
                 info!("Entity {:?}", world.inspect_entity(entity));
             }
+            
             warn!("Could not find CameraSpot with name {:?}", next.0);
         }
     }

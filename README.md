@@ -14,7 +14,7 @@ A framework for building 3d adventure games in Bevy.
 - `WorldState` resource, a stringly-typed storage for tracking progression
 - `Inventory` resource allows you to track held items and create recipes for combining them
 - Automatic camera animation and state management, Component-based interface
-- Support for multiple scenes (built on top of `iyes_loopless`)
+- Support for multiple scenes (built on top of `stageless`)
 
 ## Examples
 
@@ -31,7 +31,7 @@ If you want to implement this, here is what you need to keep track of:
 - `CurrentSpot` resource, which determines your current camera spot in the scene.
 When saving, save the name of the `CameraSpot` from this resource.
 When loading, create a new `NextSpot` instance from the loaded name, and insert it with `Commands`.
-- `CurrentState<State>` resource, (from `iyes_loopless`) which determines what scene is currently loaded
+- `State<S>` resource, which determines what scene is currently loaded
 - `Inventory` resource, which tracks what items the player is holding
 - `WorldState` resource, the global game state storage
 
@@ -87,16 +87,17 @@ NOTE: We do not track Bevy main.
 
 |Bevy Version|Crate Version              |
 |------------|---------------------------|
+|`0.10`      |`0.5`                      |
 |`0.9`       |`0.1`, `0.2`, `0.3`, `0.4` |
 
-[img_bevy]: https://img.shields.io/badge/Bevy-0.9-blue
+[img_bevy]: https://img.shields.io/badge/Bevy-0.10-blue
 [img_version]: https://img.shields.io/crates/v/bevy_adventure.svg
 [img_doc]: https://docs.rs/bevy_adventure/badge.svg
 [img_license]: https://img.shields.io/badge/license-MIT%2FApache-blue.svg
 [img_downloads]:https://img.shields.io/crates/d/bevy_adventure.svg
 [img_tracking]: https://img.shields.io/badge/Bevy%20tracking-released%20version-lightblue
 
-[bevy]: https://crates.io/crates/bevy/0.9.1
+[bevy]: https://crates.io/crates/bevy/0.10.0
 [crates]: https://crates.io/crates/bevy_adventure
 [doc]: https://docs.rs/bevy_adventure/
 [license]: https://github.com/hankjordan/bevy_adventure#license

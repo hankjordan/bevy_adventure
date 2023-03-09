@@ -1,3 +1,5 @@
+use std::marker::PhantomData;
+
 use bevy::{
     ecs::system::SystemParam,
     prelude::*,
@@ -56,7 +58,10 @@ pub struct NewMessage(pub Message);
 
 #[derive(SystemParam)]
 pub struct TextDisplay<'w, 's> {
-    events: EventWriter<'w, 's, NewMessage>,
+    events: EventWriter<'w, NewMessage>,
+
+    #[system_param(ignore)]
+    _marker: PhantomData<&'s ()>,
 }
 
 impl<'w, 's> TextDisplay<'w, 's> {
