@@ -4,26 +4,25 @@ use std::{
 };
 
 use bevy::prelude::*;
-#[cfg(feature = "serde")]
-use serde::{
-    Deserialize,
-    Serialize,
-};
 
 pub struct WorldStatePlugin;
 
 impl Plugin for WorldStatePlugin {
     fn build(&self, app: &mut App) {
         app ////
-            .insert_resource(WorldState::default());
+            .register_type::<WorldState>()
+            .register_type::<HashMap<String, String>>()
+            ////
+            .init_resource::<WorldState>();
     }
 }
 
 /// Stringly-typed key value store for tracking game progression.
 ///
 /// Use it when you want to persist state for interactives (or anything else that needs to work with interactives).
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-#[derive(Resource, Debug, Default)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[derive(Resource, Debug, Default, Reflect)]
+#[reflect(Resource)]
 pub struct WorldState {
     map: HashMap<String, String>,
 }

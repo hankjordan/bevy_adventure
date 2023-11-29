@@ -12,6 +12,8 @@ pub struct AnimationPlugin;
 impl Plugin for AnimationPlugin {
     fn build(&self, app: &mut App) {
         app ////
+            .register_type::<Tween<Transform>>()
+            ////
             .init_resource::<AnimationRegistry>()
             .init_resource::<AnimationQueue>()
             ////
@@ -19,12 +21,14 @@ impl Plugin for AnimationPlugin {
     }
 }
 
-#[derive(Component)]
-pub struct Tween<T> {
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[derive(Component, Default, Reflect)]
+#[reflect(Component)]
+pub struct Tween<T: Default> {
     pub target: T,
 }
 
-impl<T> Tween<T> {
+impl<T: Default> Tween<T> {
     pub fn new(target: T) -> Self {
         Self { target }
     }

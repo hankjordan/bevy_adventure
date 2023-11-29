@@ -9,6 +9,7 @@ use crate::{
 };
 
 /// An enum of possible actions an Interactive might take after being interacted with in some way.
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(Clone, Debug)]
 pub enum Action<State> {
     /// Add an item to the player's inventory.

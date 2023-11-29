@@ -8,6 +8,11 @@ pub struct CameraSpotPlugin;
 impl Plugin for CameraSpotPlugin {
     fn build(&self, app: &mut App) {
         app ////
+            .register_type::<CurrentSpot>()
+            .register_type::<Option<CameraSpot>>()
+            .register_type::<CameraSpot>()
+            .register_type::<IsCameraSpot>()
+            ////
             .init_resource::<CurrentSpot>();
     }
 }
@@ -15,7 +20,9 @@ impl Plugin for CameraSpotPlugin {
 /// Resource that specifies what `CameraSpot` the player is at.
 ///
 /// If you want to change what position the Camera is currently at, use `NextSpot`.
-#[derive(Resource, Default, Debug)]
+#[derive(Resource, Default, Debug, Reflect)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[reflect(Resource)]
 pub struct CurrentSpot {
     spot: Option<CameraSpot>,
 }
@@ -49,7 +56,8 @@ impl CurrentSpot {
 }
 
 /// A `CameraSpot` - a location the Camera might be at in the scene.
-#[derive(Debug)]
+#[derive(Debug, Reflect)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct CameraSpot {
     name: String,
     entity: Entity,
@@ -87,7 +95,9 @@ impl CameraSpot {
     }
 }
 
-#[derive(Component, Debug)]
+#[derive(Component, Debug, Default, Reflect)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[reflect(Component)]
 pub struct IsCameraSpot;
 
 /// `SystemParam` for retrieving `CameraSpots` for entities or from names.

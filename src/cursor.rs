@@ -5,6 +5,7 @@ pub struct CursorPlugin;
 impl Plugin for CursorPlugin {
     fn build(&self, app: &mut App) {
         app ////
+            .register_type::<Cursor>()
             .init_resource::<Cursor>()
             .add_systems(First, update_cursor);
     }
@@ -15,7 +16,9 @@ impl Plugin for CursorPlugin {
 /// Updated with the current mouse position whenever it is moved.
 /// This resource can be used to render a cursor icon or move the cursor from gamepad inputs.
 /// The position of this Cursor resource is used when interacting with objects in the scene.
-#[derive(Resource, Default)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[derive(Resource, Default, Reflect)]
+#[reflect(Resource)]
 pub struct Cursor {
     position: Vec2,
     last_position: Vec2,

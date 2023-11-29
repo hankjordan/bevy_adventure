@@ -10,10 +10,23 @@ use crate::{
     Ignores,
 };
 
+pub struct HoveringPlugin;
+
+impl Plugin for HoveringPlugin {
+    fn build(&self, app: &mut App) {
+        app ////
+            .register_type::<Hovering>()
+            .init_resource::<Hovering>()
+            .add_systems(PreUpdate, hovering_raycast);
+    }
+}
+
 /// The entity that the cursor is currently hovering over, if any.
 ///
 /// This may or may not be an Interactive.
-#[derive(Resource, Default)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[derive(Resource, Default, Reflect)]
+#[reflect(Resource)]
 pub struct Hovering {
     /// The entity.
     pub entity: Option<Entity>,

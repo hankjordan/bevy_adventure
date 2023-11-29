@@ -13,14 +13,16 @@ use crate::{
     Ignores,
 };
 
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, States)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, States, Reflect)]
 pub enum NoState {
     #[default]
     State,
 }
 
 /// An `Interactive` that just runs the given actions when interacted with.
-#[derive(Component)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[derive(Component, Clone)]
 pub struct Simple<State> {
     actions: Vec<Action<State>>,
 }
@@ -116,7 +118,9 @@ impl Portal {
 /// A preset `Interactive` that does nothing when interacted with.
 ///
 /// Useful for creating objects that are just for looking at.
-#[derive(Component)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[derive(Component, Default, Reflect)]
+#[reflect(Component)]
 pub struct Prop;
 
 impl Interactive for Prop {
@@ -130,7 +134,9 @@ impl Interactive for Prop {
 /// A preset `Interactive` that does nothing when interacted with.
 ///
 /// Useful for creating camera triggers, prevents interacting with objects behind it until it is focused.
-#[derive(Component)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[derive(Component, Default, Reflect)]
+#[reflect(Component)]
 pub struct Trigger;
 
 impl Trigger {

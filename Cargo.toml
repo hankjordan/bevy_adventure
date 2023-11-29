@@ -9,7 +9,7 @@ repository = "https://github.com/hankjordan/bevy_adventure"
 
 [features]
 default = []
-serde = ["dep:serde"]
+serde = ["dep:serde", "bevy/serialize"]
 
 [dev-dependencies]
 bevy = { version = "0.12", features = ["jpeg"] }

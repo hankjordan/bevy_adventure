@@ -6,10 +6,8 @@ use bevy::{
 };
 
 use crate::interactives::{
-    hovering::{
-        hovering_raycast,
-        Hovering,
-    },
+    hovering::HoveringPlugin,
+    interact::InteractionPlugin,
     interactive,
     simple::{
         NoState,
@@ -17,7 +15,6 @@ use crate::interactives::{
         Simple,
         Trigger,
     },
-    Interaction,
 };
 
 pub struct InteractivesPlugin<S>(PhantomData<S>);
@@ -34,8 +31,11 @@ where
 {
     fn build(&self, app: &mut App) {
         app ////
-            .init_resource::<Hovering>()
-            .init_resource::<Interaction>()
+            .add_plugins((HoveringPlugin, InteractionPlugin))
+            ////
+            //.register_type::<Simple<NoState>>()
+            //.register_type::<Simple<S>>()
+            ////
             ////
             .add_systems(
                 Update,
@@ -45,7 +45,6 @@ where
                     interactive::<Prop>,
                     interactive::<Trigger>,
                 ),
-            )
-            .add_systems(PreUpdate, hovering_raycast);
+            );
     }
 }

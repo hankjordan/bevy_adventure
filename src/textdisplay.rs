@@ -17,6 +17,7 @@ impl Plugin for TextDisplayPlugin {
 }
 
 /// A struct that represents a message that should be displayed.
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(Clone, Debug)]
 pub enum Message {
     /// Free-form text.

@@ -1,13 +1,8 @@
-use std::collections::{
-    HashMap,
-    HashSet,
-};
+use std::collections::HashMap;
 
-use bevy::prelude::*;
-#[cfg(feature = "serde")]
-use serde::{
-    Deserialize,
-    Serialize,
+use bevy::{
+    prelude::*,
+    utils::HashSet,
 };
 
 use crate::textdisplay::{
@@ -20,6 +15,14 @@ pub struct InventoryPlugin;
 impl Plugin for InventoryPlugin {
     fn build(&self, app: &mut App) {
         app ////
+            .register_type::<Inventory>()
+            .register_type::<HashSet<Item>>()
+            .register_type::<Item>()
+            .register_type::<DraggingItem>()
+            .register_type::<Option<Item>>()
+            .register_type::<Recipes>()
+            .register_type::<HashMap<(Item, Item), Item>>()
+            ////
             .init_resource::<DraggingItem>()
             .init_resource::<Inventory>()
             .init_resource::<Recipes>()
@@ -29,16 +32,18 @@ impl Plugin for InventoryPlugin {
 }
 
 /// A resource that stores the player's current inventory.
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-#[derive(Resource, Debug, Default)]
+
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[derive(Resource, Debug, Default, Reflect)]
+#[reflect(Resource)]
 pub struct Inventory {
     /// The items held in the inventory.
     pub items: HashSet<Item>,
 }
 
 /// An item.
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-#[derive(Clone, Debug, PartialEq, Eq, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[derive(Clone, Debug, PartialEq, Eq, Hash, Reflect)]
 pub struct Item {
     name: String,
 }
@@ -70,7 +75,9 @@ impl From<String> for Item {
 }
 
 /// A resource that stores which items are being dragged, if any.
-#[derive(Resource, Default)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[derive(Resource, Default, Reflect)]
+#[reflect(Resource)]
 pub struct DraggingItem {
     /// Source item name
     pub src: Option<Item>,
@@ -87,7 +94,9 @@ impl DraggingItem {
 }
 
 /// A resource that stores all registered item combinations.
-#[derive(Resource, Default)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[derive(Resource, Default, Reflect)]
+#[reflect(Resource)]
 pub struct Recipes {
     map: HashMap<(Item, Item), Item>,
 }

@@ -35,12 +35,28 @@ use crate::{
     MAIN_CAMERA,
 };
 
-#[derive(Resource, Default)]
+pub struct InteractionPlugin;
+
+impl Plugin for InteractionPlugin {
+    fn build(&self, app: &mut App) {
+        app ////
+            .register_type::<Interaction>()
+            .register_type::<State>()
+            .register_type::<LookingAt>()
+            ////
+            .init_resource::<Interaction>();
+    }
+}
+
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[derive(Resource, Default, Reflect)]
+#[reflect(Resource)]
 pub struct Interaction {
     state: State,
 }
 
-#[derive(Default)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[derive(Default, Reflect)]
 pub enum State {
     #[default]
     Ready,
@@ -81,8 +97,17 @@ pub fn reset_interaction(mut commands: Commands) {
     commands.insert_resource(Interaction::default());
 }
 
-#[derive(Resource)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[derive(Resource, Reflect)]
+#[reflect(Resource)]
 pub struct LookingAt(pub Entity);
+
+// For Reflect
+impl Default for LookingAt {
+    fn default() -> Self {
+        Self(Entity::PLACEHOLDER)
+    }
+}
 
 #[allow(clippy::needless_pass_by_value)]
 #[allow(clippy::too_many_arguments)]

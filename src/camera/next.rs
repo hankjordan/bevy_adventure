@@ -15,16 +15,23 @@ pub struct NextPlugin;
 impl Plugin for NextPlugin {
     fn build(&self, app: &mut App) {
         app ////
+            .register_type::<SkipAnimation>()
+            .register_type::<NextSpot>()
+            ////
             .add_systems(Last, handle_next_spot);
     }
 }
 
 /// Insert this resource at the same time as `NextSpot` to skip animation.
-#[derive(Resource, Default)]
+#[derive(Resource, Default, Reflect)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[reflect(Resource)]
 pub struct SkipAnimation;
 
 /// Insert this resource to determine what `CameraSpot` the Camera will move to next.
-#[derive(Resource, Default)]
+#[derive(Resource, Default, Reflect)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[reflect(Resource)]
 pub struct NextSpot(pub String);
 
 #[allow(clippy::needless_pass_by_value)]
