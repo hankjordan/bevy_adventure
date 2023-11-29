@@ -38,7 +38,7 @@ pub struct SceneManagerPlugin;
 impl Plugin for SceneManagerPlugin {
     fn build(&self, app: &mut App) {
         app
-            .add_system(run_hooks);
+            .add_systems(Update, run_hooks);
     }
 }
 
@@ -198,10 +198,10 @@ impl AppSceneStateExt for App {
         S::setup(self);
 
         self ////
-            .add_system(reset_interaction.in_base_set(CoreSet::First))
-            .add_system(prepare_interaction::<S::State>.in_base_set(CoreSet::PreUpdate))
-            .add_system(spawn_scene::<S>.in_schedule(OnEnter(S::state())))
-            .add_system(cleanup_scene.in_schedule(OnExit(S::state())))
+            .add_systems(First, reset_interaction)
+            .add_systems(PreUpdate, prepare_interaction::<S::State>)
+            .add_systems(OnEnter(S::state()), spawn_scene::<S>)
+            .add_systems(OnExit(S::state()), cleanup_scene)
     }
 
     fn add_interactive<S, I>(&mut self) -> &mut App
@@ -209,7 +209,7 @@ impl AppSceneStateExt for App {
         S: Scene + 'static,
         I: Interactive + Component,
     {
-        self.add_system(interactive::<I>.run_if(in_state(S::state())))
+        self.add_systems(Update, interactive::<I>.run_if(in_state(S::state())))
     }
 }
 

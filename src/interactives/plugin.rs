@@ -24,7 +24,7 @@ pub struct InteractivesPlugin<S>(PhantomData<S>);
 
 impl<S> Default for InteractivesPlugin<S> {
     fn default() -> Self {
-        Self(PhantomData::default())
+        Self(PhantomData)
     }
 }
 
@@ -36,12 +36,12 @@ where S: States {
             .init_resource::<Hovering>()
             .init_resource::<Interaction>()
 
-            .add_system(interactive::<Simple<NoState>>)
-            .add_system(interactive::<Simple<S>>)
-            
-            .add_system(interactive::<Prop>)
-            .add_system(interactive::<Trigger>)
-            
-            .add_system(hovering_raycast.in_base_set(CoreSet::PreUpdate));
+            .add_systems(Update, (
+                interactive::<Simple<NoState>>,
+                interactive::<Simple<S>>,
+                interactive::<Prop>,
+                interactive::<Trigger>
+            ))
+            .add_systems(PreUpdate, hovering_raycast);
     }
 }

@@ -11,7 +11,6 @@ pub struct CameraPlugin;
 impl Plugin for CameraPlugin {
     fn build(&self, app: &mut App) {
         app
-            .add_plugin(CameraSpotPlugin)
-            .add_plugin(NextPlugin);
+            .add_plugins((CameraSpotPlugin, NextPlugin));
     }
 }

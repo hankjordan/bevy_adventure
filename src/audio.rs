@@ -44,7 +44,7 @@ impl AudioRegistry {
 pub struct AudioServer<'w, 's> {
     asset_server: Res<'w, AssetServer>,
     registry: ResMut<'w, AudioRegistry>,
-    player: Res<'w, Audio>,
+    //player: Res<'w, Audio>,
 
     #[system_param(ignore)]
     marker: PhantomData<&'s ()>,
@@ -53,14 +53,16 @@ pub struct AudioServer<'w, 's> {
 impl<'w, 's> AudioServer<'w, 's> {
     /// Load an `AudioSource` by path.
     pub fn load(&mut self, name: &str) -> &mut Self {
-        self.registry.insert(name, self.asset_server.load(name));
+        // TODO
+        //self.registry.insert(name, self.asset_server.load(name));
         self
     }
 
     /// Play an `AudioSource` by path.
     pub fn play(&self, name: &str) {
         if let Some(source) = self.registry.get(name) {
-            self.player.play(source);
+            // TODO
+            //self.player.play(source);
         }
     }
 }

@@ -16,7 +16,7 @@ pub struct NextPlugin;
 impl Plugin for NextPlugin {
     fn build(&self, app: &mut App) {
         app
-            .add_system(handle_next_spot.in_base_set(CoreSet::Last));
+            .add_systems(Last, handle_next_spot);
     }
 }
 

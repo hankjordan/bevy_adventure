@@ -7,7 +7,7 @@ impl Plugin for CursorPlugin {
     fn build(&self, app: &mut App) {
         app
             .init_resource::<Cursor>()
-            .add_system(update_cursor.in_base_set(CoreSet::First));
+            .add_systems(First, update_cursor);
     }
 }
 

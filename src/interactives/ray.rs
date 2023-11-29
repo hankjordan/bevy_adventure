@@ -35,7 +35,9 @@ impl Ray3d {
     ) -> Option<Self> {
         let view = camera_transform.compute_matrix();
 
-        let (viewport_min, viewport_max) = camera.logical_viewport_rect()?;
+        let viewport = camera.logical_viewport_rect()?;
+        let (viewport_min, viewport_max) = (viewport.min, viewport.max);
+        
         let screen_size = camera.logical_target_size()?;
         let viewport_size = viewport_max - viewport_min;
         let adj_cursor_pos =

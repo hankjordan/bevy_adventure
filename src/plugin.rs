@@ -25,7 +25,7 @@ pub struct AdventurePlugin<S>(PhantomData<S>);
 
 impl<S> Default for AdventurePlugin<S> {
     fn default() -> Self {
-        Self(PhantomData::default())
+        Self(PhantomData)
     }
 }
 
@@ -35,14 +35,16 @@ where
 {
     fn build(&self, app: &mut App) {
         app ////
-            .add_plugin(AnimationPlugin)
-            .add_plugin(AudioPlugin)
-            .add_plugin(CameraPlugin)
-            .add_plugin(CursorPlugin)
-            .add_plugin(InteractivesPlugin::<S>::default())
-            .add_plugin(InventoryPlugin)
-            .add_plugin(SceneManagerPlugin)
-            .add_plugin(TextDisplayPlugin)
-            .add_plugin(WorldStatePlugin);
+            .add_plugins((
+                AnimationPlugin,
+                AudioPlugin,
+                CameraPlugin,
+                CursorPlugin,
+                InteractivesPlugin::<S>::default(),
+                InventoryPlugin,
+                SceneManagerPlugin,
+                TextDisplayPlugin,
+                WorldStatePlugin,
+            ));
     }
 }

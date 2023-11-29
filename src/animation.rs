@@ -13,11 +13,10 @@ pub struct AnimationPlugin;
 impl Plugin for AnimationPlugin {
     fn build(&self, app: &mut App) {
         app
-            .insert_resource(AnimationRegistry::default())
-            .insert_resource(AnimationQueue::default())
+            .init_resource::<AnimationRegistry>()
+            .init_resource::<AnimationQueue>()
             
-            .add_system(tween_transforms)
-            .add_system(play_animations);
+            .add_systems(Update, (tween_transforms, play_animations));
     }
 }
 

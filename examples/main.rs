@@ -337,22 +337,23 @@ fn setup_audio(mut server: AudioServer) {
 }
 
 fn print_messages(mut messages: EventReader<NewMessage>) {
-    for message in messages.iter() {
+    for message in messages.read() {
         println!("Message: {:?}", message);
     }
 }
 
 fn main() {
     App::new()
-        .add_plugins(DefaultPlugins.build().set(AssetPlugin {
-            asset_folder: "examples/assets".to_owned(),
-            ..default()
-        }))
         ////
-        .add_plugin(RapierPhysicsPlugin::<NoUserData>::default())
-        .add_plugin(RapierDebugRenderPlugin::default())
-        ////
-        .add_plugin(AdventurePlugin::<GameState>::default())
+        .add_plugins((
+            DefaultPlugins.build().set(AssetPlugin {
+                file_path: "examples/assets".to_owned(),
+                ..default()
+            }),
+            RapierPhysicsPlugin::<NoUserData>::default(),
+            RapierDebugRenderPlugin::default(),
+            AdventurePlugin::<GameState>::default(),
+        ))
         ////
         // Important: register state via `add_adventure_state` instead of `add_loopless_state`
         // This allows NextSpot to work between Scenes (Requires `SystemTransitionStage` to run after `CoreStage::Update`)
@@ -362,9 +363,9 @@ fn main() {
         .add_scene::<BedroomScene>()
         .add_scene::<HallwayScene>()
         ////
-        .add_startup_system(setup_audio)
+        .add_systems(Startup, setup_audio)
         ////
-        .add_system(print_messages)
+        .add_systems(Update, print_messages)
         ////
         .run();
 }

@@ -21,11 +21,11 @@ pub struct InventoryPlugin;
 impl Plugin for InventoryPlugin {
     fn build(&self, app: &mut App) {
         app
-            .insert_resource(DraggingItem::default())
-            .insert_resource(Inventory::default())
-            .insert_resource(Recipes::default())
+            .init_resource::<DraggingItem>()
+            .init_resource::<Inventory>()
+            .init_resource::<Recipes>()
             
-            .add_system(handle_combine);
+            .add_systems(Update, handle_combine);
     }
 }
 

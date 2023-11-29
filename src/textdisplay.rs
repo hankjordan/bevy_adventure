@@ -53,7 +53,7 @@ impl Message {
 }
 
 /// An event that triggers whenever an `Action::Message` is executed.
-#[derive(Debug)]
+#[derive(Debug, Event)]
 pub struct NewMessage(pub Message);
 
 #[derive(SystemParam)]
