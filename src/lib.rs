@@ -58,8 +58,8 @@ pub use crate::{
     },
     plugin::AdventurePlugin,
     scene::{
+        AdventureScene,
         AppSceneStateExt,
-        Scene,
     },
     state::WorldState,
     textdisplay::{
@@ -67,3 +67,24 @@ pub use crate::{
         NewMessage,
     },
 };
+
+/// Prelude: convenient import for all the user-facing APIs provided by the crate
+pub mod prelude {
+    pub use crate::{
+        Action,
+        AdventurePlugin,
+        AdventureScene,
+        AnimationServer,
+        AppSceneStateExt,
+        AudioServer,
+        CommandsExt,
+        Description,
+        Interactive,
+        Item,
+        Message,
+        NewMessage,
+        Simple,
+        Trigger,
+        WorldState,
+    };
+}

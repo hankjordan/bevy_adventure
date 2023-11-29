@@ -7,23 +7,7 @@ use bevy::{
     },
     prelude::*,
 };
-use bevy_adventure::{
-    Action,
-    AdventurePlugin,
-    AnimationServer,
-    AppSceneStateExt,
-    AudioServer,
-    CommandsExt,
-    Description,
-    Interactive,
-    Item,
-    Message,
-    NewMessage,
-    Scene,
-    Simple,
-    Trigger,
-    WorldState,
-};
+use bevy_adventure::prelude::*;
 use bevy_rapier3d::prelude::*;
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, States)]
@@ -51,7 +35,7 @@ impl Interactive for Cup {
 
 struct BathroomScene;
 
-impl Scene for BathroomScene {
+impl AdventureScene for BathroomScene {
     type State = GameState;
 
     fn state() -> Self::State {
@@ -188,7 +172,7 @@ impl Interactive for TrashCan {
 
 struct BedroomScene;
 
-impl Scene for BedroomScene {
+impl AdventureScene for BedroomScene {
     type State = GameState;
 
     fn state() -> Self::State {
@@ -248,7 +232,7 @@ impl Scene for BedroomScene {
             // This is because the CameraSpot with the name `Camera_Trash_Can`
             // is automatically tried when we interact with the Trash Can.
             //
-            // Creating a camera in the scene with the name Camera_OBJECT will
+            // Creating a camera in the AdventureScene with the name Camera_OBJECT will
             // cause this effect for OBJECT.
             Some(TRASH_CAN) => commands
                 .insert(Collider::cuboid(0.3, 0.3, 0.3))
@@ -284,7 +268,7 @@ impl Scene for BedroomScene {
 
 struct HallwayScene;
 
-impl Scene for HallwayScene {
+impl AdventureScene for HallwayScene {
     type State = GameState;
 
     fn state() -> Self::State {

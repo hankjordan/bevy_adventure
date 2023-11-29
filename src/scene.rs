@@ -156,7 +156,7 @@ impl<'w, 's> SceneManager<'w, 's> {
 
 /// Trait that provides a `Plugin`-like interface for defining game scenes.
 #[allow(unused_variables)]
-pub trait Scene {
+pub trait AdventureScene {
     /// The type of the state that the scene is a part of.
     type State: States;
 
@@ -184,17 +184,17 @@ pub trait AppSceneStateExt {
     /// Add a Scene to the app.
     ///
     /// Calls the Scene's setup method.
-    fn add_scene<S: Scene + 'static>(&mut self) -> &mut App;
+    fn add_scene<S: AdventureScene + 'static>(&mut self) -> &mut App;
 
     /// Register an interactive for a Scene.
     fn add_interactive<S, I>(&mut self) -> &mut App
     where
-        S: Scene + 'static,
+        S: AdventureScene + 'static,
         I: Interactive + Component;
 }
 
 impl AppSceneStateExt for App {
-    fn add_scene<S: Scene + 'static>(&mut self) -> &mut App {
+    fn add_scene<S: AdventureScene + 'static>(&mut self) -> &mut App {
         S::setup(self);
 
         self ////
@@ -206,14 +206,14 @@ impl AppSceneStateExt for App {
 
     fn add_interactive<S, I>(&mut self) -> &mut App
     where
-        S: Scene + 'static,
+        S: AdventureScene + 'static,
         I: Interactive + Component,
     {
         self.add_systems(Update, interactive::<I>.run_if(in_state(S::state())))
     }
 }
 
-fn spawn_scene<S: Scene + 'static>(
+fn spawn_scene<S: AdventureScene + 'static>(
     mut manager: SceneManager,
     mut animation_server: AnimationServer,
     mut audio_server: AudioServer,

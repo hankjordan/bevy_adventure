@@ -5,7 +5,7 @@ use bevy::{
     prelude::*,
 };
 
-use crate::Scene;
+use crate::AdventureScene;
 
 pub struct AnimationPlugin;
 
@@ -145,7 +145,7 @@ pub struct AnimationServer<'w, 's> {
 
 impl<'w, 's> AnimationServer<'w, 's> {
     /// Load a named animation for a given Scene.
-    pub fn load<S: Scene>(&mut self, name: &str) -> &mut Self {
+    pub fn load<S: AdventureScene>(&mut self, name: &str) -> &mut Self {
         let full = S::scene();
 
         let scene;
