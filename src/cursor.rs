@@ -2,10 +2,9 @@ use bevy::prelude::*;
 
 pub struct CursorPlugin;
 
-#[rustfmt::skip]
 impl Plugin for CursorPlugin {
     fn build(&self, app: &mut App) {
-        app
+        app ////
             .init_resource::<Cursor>()
             .add_systems(First, update_cursor);
     }
@@ -41,10 +40,7 @@ impl Cursor {
 }
 
 #[allow(clippy::needless_pass_by_value)]
-fn update_cursor(
-    mut cursor: ResMut<Cursor>,
-    windows: Query<&Window>,
-) {
+fn update_cursor(mut cursor: ResMut<Cursor>, windows: Query<&Window>) {
     for window in &windows {
         if let Some(mouse) = window.cursor_position() {
             if mouse != cursor.last_position {

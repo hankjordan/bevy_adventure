@@ -11,11 +11,10 @@ use bevy::{
 
 pub struct AudioPlugin;
 
-#[rustfmt::skip]
 impl Plugin for AudioPlugin {
     fn build(&self, app: &mut App) {
-        app
-            .insert_resource(AudioRegistry::default());
+        app ////
+            .init_resource::<AudioRegistry>();
     }
 }
 
@@ -45,7 +44,6 @@ pub struct AudioServer<'w, 's> {
     asset_server: Res<'w, AssetServer>,
     registry: ResMut<'w, AudioRegistry>,
     //player: Res<'w, Audio>,
-
     #[system_param(ignore)]
     marker: PhantomData<&'s ()>,
 }

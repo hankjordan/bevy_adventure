@@ -28,20 +28,24 @@ impl<S> Default for InteractivesPlugin<S> {
     }
 }
 
-#[rustfmt::skip]
-impl<S> Plugin for InteractivesPlugin<S> 
-where S: States {
+impl<S> Plugin for InteractivesPlugin<S>
+where
+    S: States,
+{
     fn build(&self, app: &mut App) {
-        app
+        app ////
             .init_resource::<Hovering>()
             .init_resource::<Interaction>()
-
-            .add_systems(Update, (
-                interactive::<Simple<NoState>>,
-                interactive::<Simple<S>>,
-                interactive::<Prop>,
-                interactive::<Trigger>
-            ))
+            ////
+            .add_systems(
+                Update,
+                (
+                    interactive::<Simple<NoState>>,
+                    interactive::<Simple<S>>,
+                    interactive::<Prop>,
+                    interactive::<Trigger>,
+                ),
+            )
             .add_systems(PreUpdate, hovering_raycast);
     }
 }

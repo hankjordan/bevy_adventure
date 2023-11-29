@@ -9,13 +9,12 @@ use crate::AdventureScene;
 
 pub struct AnimationPlugin;
 
-#[rustfmt::skip]
 impl Plugin for AnimationPlugin {
     fn build(&self, app: &mut App) {
-        app
+        app ////
             .init_resource::<AnimationRegistry>()
             .init_resource::<AnimationQueue>()
-            
+            ////
             .add_systems(Update, (tween_transforms, play_animations));
     }
 }

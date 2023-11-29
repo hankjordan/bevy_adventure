@@ -9,10 +9,9 @@ use crate::Item;
 
 pub struct TextDisplayPlugin;
 
-#[rustfmt::skip]
 impl Plugin for TextDisplayPlugin {
     fn build(&self, app: &mut App) {
-        app
+        app ////
             .add_event::<NewMessage>();
     }
 }

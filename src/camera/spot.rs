@@ -5,10 +5,9 @@ use bevy::{
 
 pub struct CameraSpotPlugin;
 
-#[rustfmt::skip]
 impl Plugin for CameraSpotPlugin {
     fn build(&self, app: &mut App) {
-        app
+        app ////
             .init_resource::<CurrentSpot>();
     }
 }

@@ -7,10 +7,9 @@ use crate::camera::{
 
 pub struct CameraPlugin;
 
-#[rustfmt::skip]
 impl Plugin for CameraPlugin {
     fn build(&self, app: &mut App) {
-        app
+        app ////
             .add_plugins((CameraSpotPlugin, NextPlugin));
     }
 }

@@ -17,14 +17,13 @@ use crate::textdisplay::{
 
 pub struct InventoryPlugin;
 
-#[rustfmt::skip]
 impl Plugin for InventoryPlugin {
     fn build(&self, app: &mut App) {
-        app
+        app ////
             .init_resource::<DraggingItem>()
             .init_resource::<Inventory>()
             .init_resource::<Recipes>()
-            
+            ////
             .add_systems(Update, handle_combine);
     }
 }

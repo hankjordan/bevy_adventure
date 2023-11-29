@@ -16,7 +16,7 @@ use crate::{
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, States)]
 pub enum NoState {
     #[default]
-    State
+    State,
 }
 
 /// An `Interactive` that just runs the given actions when interacted with.

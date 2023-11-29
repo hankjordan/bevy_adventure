@@ -12,10 +12,9 @@ use crate::{
 
 pub struct NextPlugin;
 
-#[rustfmt::skip]
 impl Plugin for NextPlugin {
     fn build(&self, app: &mut App) {
-        app
+        app ////
             .add_systems(Last, handle_next_spot);
     }
 }
@@ -63,7 +62,7 @@ fn handle_next_spot(world: &mut World) {
             for entity in world.iter_entities().map(|e| e.id()) {
                 info!("Entity {:?}", world.inspect_entity(entity));
             }
-            
+
             warn!("Could not find CameraSpot with name {:?}", next.0);
         }
     }

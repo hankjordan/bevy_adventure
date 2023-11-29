@@ -34,10 +34,9 @@ use crate::{
 
 pub struct SceneManagerPlugin;
 
-#[rustfmt::skip]
 impl Plugin for SceneManagerPlugin {
     fn build(&self, app: &mut App) {
-        app
+        app ////
             .add_systems(Update, run_hooks);
     }
 }
