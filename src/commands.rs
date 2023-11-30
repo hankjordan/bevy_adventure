@@ -96,7 +96,7 @@ impl<'w, 's> CommandsExt<'w, 's> {
     }
 
     /// Play a named audio clip on the [`AudioServer`]
-    pub fn play_audio(&self, name: &str) {
+    pub fn play_audio(&mut self, name: &str) {
         self.audio_server.play(name);
     }
 }

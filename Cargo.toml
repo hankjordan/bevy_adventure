@@ -13,6 +13,7 @@ serde = ["dep:serde", "bevy/serialize"]
 
 [dev-dependencies]
 bevy = { version = "0.12", features = ["jpeg"] }
+bevy-inspector-egui = "0.21"
 
 [dependencies]
 bevy = { version = "0.12", default-features = false, features = ["animation", "bevy_audio"] }

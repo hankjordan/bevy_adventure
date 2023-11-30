@@ -1,7 +1,4 @@
-use std::{
-    collections::HashMap,
-    marker::PhantomData,
-};
+use std::collections::HashMap;
 
 use bevy::{
     audio::AudioSource,
@@ -14,7 +11,20 @@ pub struct AudioPlugin;
 impl Plugin for AudioPlugin {
     fn build(&self, app: &mut App) {
         app ////
-            .init_resource::<AudioRegistry>();
+            .init_resource::<AudioRegistry>()
+            .add_systems(Update, cleanup_audio);
+    }
+}
+
+#[derive(Component)]
+struct AudioPlayer;
+
+#[allow(clippy::needless_pass_by_value)]
+fn cleanup_audio(mut commands: Commands, sinks: Query<(Entity, &AudioSink), With<AudioPlayer>>) {
+    for (entity, sink) in &sinks {
+        if sink.empty() {
+            commands.entity(entity).despawn();
+        }
     }
 }
 
@@ -41,26 +51,31 @@ impl AudioRegistry {
 /// `SystemParam` for registering `AudioSource` clips by path.
 #[derive(SystemParam)]
 pub struct AudioServer<'w, 's> {
+    commands: Commands<'w, 's>,
+
     asset_server: Res<'w, AssetServer>,
     registry: ResMut<'w, AudioRegistry>,
-    //player: Res<'w, Audio>,
-    #[system_param(ignore)]
-    marker: PhantomData<&'s ()>,
 }
 
 impl<'w, 's> AudioServer<'w, 's> {
     /// Load an `AudioSource` by path.
     pub fn load(&mut self, name: &str) -> &mut Self {
-        // TODO
-        //self.registry.insert(name, self.asset_server.load(name));
+        self.registry
+            .insert(name, self.asset_server.load(name.to_owned()));
         self
     }
 
     /// Play an `AudioSource` by path.
-    pub fn play(&self, name: &str) {
+    pub fn play(&mut self, name: &str) {
         if let Some(source) = self.registry.get(name) {
-            // TODO
-            //self.player.play(source);
+            self.commands.spawn((
+                Name::from(name),
+                AudioBundle {
+                    source,
+                    ..default()
+                },
+                AudioPlayer,
+            ));
         }
     }
 }

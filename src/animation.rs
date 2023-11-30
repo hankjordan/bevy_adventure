@@ -143,7 +143,7 @@ pub struct AnimationServer<'w, 's> {
 
     queue: ResMut<'w, AnimationQueue>,
 
-    players: Query<'w, 's, (Entity, &'static Name), With<AnimationPlayer>>,
+    players: Query<'w, 's, (Entity, &'static Name)>,
 }
 
 impl<'w, 's> AnimationServer<'w, 's> {
@@ -173,22 +173,10 @@ impl<'w, 's> AnimationServer<'w, 's> {
     /// Play an animation with the associated `AnimationPlayer`
     pub fn play(&mut self, name: &str) {
         if let Some(handle) = self.get(name) {
-            if let Some(_animation) = self.assets.get(&handle) {
-                let names = Vec::new();
-
-                // TODO
-                /*
-                for curve in animation.curves() {
-                    for path in curve {
-                        names.extend(&path.parts);
-                    }
-                }
-                */
-
-                for (entity, name) in &self.players {
-                    if names.contains(&name) {
-                        self.queue.push(entity, handle);
-                        break;
+            if let Some(animation) = self.assets.get(&handle) {
+                for (entity, name) in &mut self.players {
+                    if animation.compatible_with(name) {
+                        self.queue.push(entity, handle.clone());
                     }
                 }
             }

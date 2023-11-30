@@ -8,6 +8,7 @@ use bevy::{
     prelude::*,
 };
 use bevy_adventure::prelude::*;
+use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use bevy_rapier3d::prelude::*;
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, States)]
@@ -336,11 +337,10 @@ fn main() {
             }),
             RapierPhysicsPlugin::<NoUserData>::default(),
             RapierDebugRenderPlugin::default(),
+            WorldInspectorPlugin::new(),
             AdventurePlugin::<GameState>::default(),
         ))
         ////
-        // Important: register state via `add_adventure_state` instead of `add_loopless_state`
-        // This allows NextSpot to work between Scenes (Requires `SystemTransitionStage` to run after `CoreStage::Update`)
         .add_state::<GameState>()
         ////
         .add_scene::<BathroomScene>()
