@@ -65,12 +65,12 @@ fn run_hooks(
     unloaded: Query<(Entity, &SceneInstance, &SceneHook), Without<SceneHooked>>,
 ) {
     for (entity, instance, hooked) in unloaded.iter() {
-        if spawner.instance_is_ready(**instance) {
-            commands.entity(entity).insert(SceneHooked);
+        if spawner.instance_is_ready(*instance.parent()) {
+            commands.window(entity).insert(SceneHooked);
         }
-        let entities = spawner.iter_instance_entities(**instance);
+        let entities = spawner.iter_instance_entities(*instance.parent());
         for entity_ref in entities.filter_map(|e| world.get_entity(e)) {
-            let mut cmd = commands.entity(entity_ref.id());
+            let mut cmd = commands.window(entity_ref.id());
             (hooked.hook)(&entity_ref, &mut cmd);
         }
     }
@@ -96,35 +96,31 @@ impl<'w, 's> SceneManager<'w, 's> {
     {
         let camera;
 
-        if let Ok(res) = self.cameras.get_single() {
+        if let Ok(res) = self.cameras.single() {
             camera = res;
         } else {
             camera = self.commands.spawn(()).id();
         }
 
         (
-            SceneBundle {
-                scene: self.asset_server.load(path),
-                ..default()
-            },
+            SceneRoot(self.asset_server.load(path)),
             SceneHook::new(move |entity, commands| {
                 if entity.contains::<Camera>() {
                     if let Some(name) = entity.get::<Name>() {
                         if name.as_str() == MAIN_CAMERA {
                             let tf = entity.get::<Transform>().unwrap();
 
-                            let spot = CameraSpot::new(name, entity.id(), *tf);
+                            let spot = CameraSpot::new(name, entity.id(), tf.parent());
 
                             commands.commands().insert_resource(CurrentSpot::new(spot));
 
                             commands
-                                .commands()
-                                .entity(camera)
+                                .commands().window(camera)
                                 .insert(Camera3dBundle {
-                                    transform: *tf,
+                                    transform: tf.parent(),
                                     ..default()
                                 })
-                                .insert(Tween::new(*tf));
+                                .insert(Tween::new(tf.parent()));
                         }
                     }
 
@@ -133,7 +129,7 @@ impl<'w, 's> SceneManager<'w, 's> {
                 }
 
                 if let Some(light) = entity.get::<PointLight>() {
-                    let mut light = *light;
+                    let mut light = light.parent();
                     light.shadows_enabled = true;
                     commands.insert(light);
                 }
@@ -228,6 +224,6 @@ fn cleanup_scene(
     scenes: Query<Entity, With<Handle<bevy::prelude::Scene>>>,
 ) {
     for scene in &scenes {
-        commands.entity(scene).despawn_recursive();
+        commands.window(scene).despawn_recursive();
     }
 }

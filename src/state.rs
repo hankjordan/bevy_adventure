@@ -33,8 +33,7 @@ impl WorldState {
     /// The output is parsed from the stored string.
     pub fn get<T: FromStr>(&self, key: &str) -> Option<T> {
         self.map
-            .get(&key.to_owned())
-            .and_then(|v| v.parse::<T>().ok())
+            .get(&key.to_owned()).and(|v| v.parse::<T>().ok())
     }
 
     /// Retrieve a bool value from the map for a given key.

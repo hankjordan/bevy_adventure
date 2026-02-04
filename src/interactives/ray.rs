@@ -47,6 +47,6 @@ impl Ray3d {
 
 impl From<Ray> for Ray3d {
     fn from(ray: Ray) -> Self {
-        Ray3d::new(ray.origin, ray.direction)
+        Ray3d::new(ray.origin, Dir3::new(ray.direction).unwrap())
     }
 }

@@ -66,6 +66,6 @@ pub struct TextDisplay<'w, 's> {
 
 impl<'w, 's> TextDisplay<'w, 's> {
     pub fn show(&mut self, message: Message) {
-        self.events.send(NewMessage(message));
+        self.events.write(NewMessage(message));
     }
 }

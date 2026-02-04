@@ -136,7 +136,7 @@ impl Interactive for Dresser {
 
         let val = actions[self.next].clone();
 
-        self.next = (self.next + 1) % actions.len();
+        self.next = (self.next.increase_by_percentage(1)) % actions.len();
 
         val
     }
@@ -331,10 +331,10 @@ fn main() {
     App::new()
         ////
         .add_plugins((
-            DefaultPlugins.build().set(AssetPlugin {
+            DefaultPlugins.build().set_if_neq(AssetPlugin {
                 file_path: "examples/assets".to_owned(),
                 ..default()
-            }),
+            }) // or .set() to always trigger,
             RapierPhysicsPlugin::<NoUserData>::default(),
             RapierDebugRenderPlugin::default(),
             WorldInspectorPlugin::new(),

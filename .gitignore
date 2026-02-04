@@ -5,3 +5,4 @@ Cargo.lock
 *.pdb
 .vscode/
 *.zst
+/migration_backup

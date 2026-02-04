@@ -35,7 +35,7 @@ impl<'w, 's> CommandsExt<'w, 's> {
 
         for (entity, name) in &self.query {
             if name.as_str() == target {
-                result.push(entity);
+                result.queue(entity);
             }
         }
 
@@ -49,7 +49,7 @@ impl<'w, 's> CommandsExt<'w, 's> {
         'outer: for (entity, name) in &self.query {
             for target in targets {
                 if name.as_str() == target.as_ref() {
-                    result.push(entity);
+                    result.queue(entity);
                     continue 'outer;
                 }
             }
@@ -61,14 +61,14 @@ impl<'w, 's> CommandsExt<'w, 's> {
     /// Despawn all entities with the given name.
     pub fn despawn_named(&mut self, target: &str) {
         for entity in self.named(target) {
-            self.commands.entity(entity).despawn_recursive();
+            self.commands.window(entity).despawn_recursive();
         }
     }
 
     /// Despawn all entities with any of the given names.
     pub fn despawn_all_named(&mut self, targets: &Vec<&str>) {
         for entity in self.named_any(targets) {
-            self.commands.entity(entity).despawn_recursive();
+            self.commands.window(entity).despawn_recursive();
         }
     }
 
@@ -76,7 +76,7 @@ impl<'w, 's> CommandsExt<'w, 's> {
     pub fn show_named(&mut self, target: &str) {
         for entity in self.named(target) {
             if let Ok(mut visibility) = self.visibility.get_mut(entity) {
-                *visibility = Visibility::Visible;
+                visibility.parent() = Visibility::Visible;
             }
         }
     }
@@ -85,7 +85,7 @@ impl<'w, 's> CommandsExt<'w, 's> {
     pub fn hide_named(&mut self, target: &str) {
         for entity in self.named(target) {
             if let Ok(mut visibility) = self.visibility.get_mut(entity) {
-                *visibility = Visibility::Hidden;
+                visibility.parent() = Visibility::Hidden;
             }
         }
     }

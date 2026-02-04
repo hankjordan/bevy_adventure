@@ -59,14 +59,14 @@ fn handle_next_spot(world: &mut World) {
         if let Some(spot) = spots.get(&next.0) {
             if let Ok((mut tf, mut animation)) = cameras.get_single_mut() {
                 if skip {
-                    *tf = spot.transform();
+                    tf.parent() = spot.transform();
                 }
 
-                animation.target = spot.transform();
+                animation.original_event_target() = spot.transform();
                 world.insert_resource(CurrentSpot::new(spot));
             }
         } else {
-            for entity in world.iter_entities().map(|e| e.id()) {
+            for entity in world.query::<EntityRef>().iter(&world).map(|e| e.id()) {
                 info!("Entity {:?}", world.inspect_entity(entity));
             }
 

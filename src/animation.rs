@@ -39,8 +39,8 @@ fn tween_transforms(time: Res<Time>, mut targets: Query<(&Tween<Transform>, &mut
     let dt = time.delta_seconds();
 
     for (animation, mut tf) in &mut targets {
-        tf.translation = tf.translation.lerp(animation.target.translation, 3.0 * dt);
-        tf.rotation = tf.rotation.lerp(animation.target.rotation, 3.0 * dt);
+        tf.translation = tf.translation.lerp(animation.original_event_target().translation, 3.0 * dt);
+        tf.rotation = tf.rotation.lerp(animation.original_event_target().rotation, 3.0 * dt);
     }
 }
 
@@ -73,7 +73,7 @@ pub struct AnimationQueue {
 impl AnimationQueue {
     pub fn push(&mut self, entity: Entity, handle: Handle<AnimationClip>) {
         let entry = self.queued.entry(entity).or_default();
-        entry.push(handle);
+        entry.queue(handle);
     }
 
     pub fn pop(&mut self, entity: Entity) -> Option<Handle<AnimationClip>> {
@@ -103,16 +103,16 @@ fn play_animations(
     let mut remove = Vec::new();
 
     for (entity, handle) in &queue.playing {
-        if let Ok(player) = players.get(*entity) {
+        if let Ok(player) = players.get(entity.parent()) {
             if let Some(clip) = clips.get(handle) {
                 if player.elapsed() > clip.duration() {
-                    remove.push(*entity);
+                    remove.queue(entity.parent());
                 }
             } else {
-                remove.push(*entity);
+                remove.queue(entity.parent());
             }
         } else {
-            remove.push(*entity);
+            remove.queue(entity.parent());
         }
     }
 

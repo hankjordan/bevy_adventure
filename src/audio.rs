@@ -23,7 +23,7 @@ struct AudioPlayer;
 fn cleanup_audio(mut commands: Commands, sinks: Query<(Entity, &AudioSink), With<AudioPlayer>>) {
     for (entity, sink) in &sinks {
         if sink.empty() {
-            commands.entity(entity).despawn();
+            commands.window(entity).despawn();
         }
     }
 }

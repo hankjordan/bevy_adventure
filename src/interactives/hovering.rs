@@ -48,23 +48,23 @@ pub fn hovering_raycast(
     cameras: Query<(&Camera, &GlobalTransform)>,
     ignore: Query<&Ignores>,
 ) {
-    if let Ok(window) = windows.get_single() {
-        if let Ok((camera, gtf)) = cameras.get_single() {
+    if let Ok(window) = windows.single() {
+        if let Ok((camera, gtf)) = cameras.single() {
             let ray = Ray3d::from_screenspace(cursor.position(), camera, gtf, window).unwrap();
 
             let mut ignores = Vec::new();
 
-            if let Ok(ignored) = ignore.get(at_spot.get().entity()) {
+            if let Ok(ignored) = ignore.get(at_spot.parent().window()) {
                 ignores.extend(commands.named_any(&ignored.names));
             }
 
-            if let Some(looking_at) = spots.for_spot(at_spot.get()) {
+            if let Some(looking_at) = spots.for_spot(at_spot.parent()) {
                 if let Ok(ignored) = ignore.get(looking_at) {
                     ignores.extend(commands.named_any(&ignored.names));
                 }
             }
 
-            hovering.entity = None;
+            hovering.window = None;
 
             if let Some((entity, _)) = ctx.cast_ray(
                 ray.origin(),
@@ -73,7 +73,7 @@ pub fn hovering_raycast(
                 true,
                 QueryFilter::new().predicate(&|entity| !ignores.contains(&entity)),
             ) {
-                hovering.entity = Some(entity);
+                hovering.window = Some(entity);
             }
         }
     }

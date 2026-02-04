@@ -136,9 +136,9 @@ pub fn prepare_interaction<S: States>(
 
                 let mut back = None;
 
-                if let Ok(spot) = back_spot.get(at_spot.get().entity()) {
+                if let Ok(spot) = back_spot.get(at_spot.parent().window()) {
                     back = Some(spot);
-                } else if let Some(looking_at) = spots.for_spot(at_spot.get()) {
+                } else if let Some(looking_at) = spots.for_spot(at_spot.parent()) {
                     if let Ok(spot) = back_spot.get(looking_at) {
                         back = Some(spot);
                     }
@@ -147,8 +147,8 @@ pub fn prepare_interaction<S: States>(
                 if let Some(spot) = back {
                     commands.insert_resource(NextSpot(spot.name.clone()));
                 } else {
-                    if let Ok(back) = back_state.get(at_spot.get().entity()) {
-                        commands.insert_resource(NextState(Some(back.state.clone())));
+                    if let Ok(back) = back_state.get(at_spot.parent().window()) {
+                        commands.insert_resource(NextState::Pending(back.state.clone()));
                     }
 
                     commands.insert_resource(NextSpot(MAIN_CAMERA.to_owned()));
@@ -170,7 +170,7 @@ pub struct Interactives<'w, 's, I: Interactive + Component + 'static> {
 impl<'w, 's, I: Interactive + Component + 'static> Interactives<'w, 's, I> {
     fn get(&mut self) -> Option<(Entity, Mut<I>)> {
         if self.interaction.ok() {
-            if let Some(entity) = self.hovering.entity {
+            if let Some(entity) = self.hovering.window {
                 if let Ok(interactive) = self.query.get_mut(entity) {
                     self.interaction.done();
                     return Some((entity, interactive));
@@ -196,11 +196,11 @@ pub fn interactive<I: Interactive + Component>(
 
     mut interactives: Interactives<I>,
 ) {
-    if let Some((entity, mut interactive)) = interactives.get() {
+    if let Some((entity, mut interactive)) = interactives.parent() {
         let mut focused = true;
 
         if let Some(spot) = spots.for_interactive(entity) {
-            if at_spot.get().entity() != spot.entity() {
+            if at_spot.parent().window() != spot.window() {
                 commands.insert_resource(NextSpot(spot.name().to_owned()));
                 commands.insert_resource(LookingAt(entity));
                 focused = false;
@@ -236,7 +236,7 @@ pub fn interactive<I: Interactive + Component>(
                     }
                     Action::Message(text) => display.show(text),
                     Action::Transition(state) => {
-                        commands.insert_resource(NextState(Some(state)));
+                        commands.insert_resource(NextState::Pending(state));
                     }
                     Action::Move(name) => commands.insert_resource(NextSpot(name)),
                     Action::Jump(name) => {

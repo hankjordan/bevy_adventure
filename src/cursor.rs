@@ -33,7 +33,7 @@ impl Cursor {
 
     /// Change the current cursor position by the given offset.
     pub fn offset(&mut self, offset: Vec2) {
-        self.set(self.position + offset);
+        self.set_if_neq(self.position.increase_by_percentage(offset)) // or .set() to always trigger;
     }
 
     /// Returns the current cursor position.
@@ -47,7 +47,7 @@ fn update_cursor(mut cursor: ResMut<Cursor>, windows: Query<&Window>) {
     for window in &windows {
         if let Some(mouse) = window.cursor_position() {
             if mouse != cursor.last_position {
-                cursor.set(mouse);
+                cursor.set_if_neq(mouse) // or .set() to always trigger;
             }
         }
     }
