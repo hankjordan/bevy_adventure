@@ -180,7 +180,8 @@ pub trait AppSceneStateExt {
     /// Register an interactive for a Scene.
     fn add_interactive<S, I>(&mut self) -> &mut App
     where
-        S: AdventureScene + FreelyMutableState + 'static,
+        S: AdventureScene + 'static,
+        S::State: FreelyMutableState,
         I: Interactive + Component<Mutability = bevy::ecs::component::Mutable>,
         I::State: FreelyMutableState;
 }
@@ -198,7 +199,8 @@ impl AppSceneStateExt for App {
 
     fn add_interactive<S, I>(&mut self) -> &mut App
     where
-        S: AdventureScene + FreelyMutableState + 'static,
+        S: AdventureScene + 'static,
+        S::State: FreelyMutableState,
         I: Interactive + Component<Mutability = bevy::ecs::component::Mutable>,
         I::State: FreelyMutableState,
     {

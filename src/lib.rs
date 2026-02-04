@@ -11,12 +11,12 @@ mod camera;
 mod commands;
 mod constants;
 mod cursor;
-mod interactives;
+pub mod interactives;
 mod inventory;
 mod plugin;
 mod scene;
-mod state;
-mod textdisplay;
+pub mod state;
+pub mod textdisplay;
 
 pub use crate::{
     animation::AnimationServer,
