@@ -4,15 +4,15 @@ use bevy::{
 };
 
 #[derive(Debug, PartialEq, Copy, Clone, Default)]
-pub struct Ray3d {
+pub struct AdventureRay {
     origin: Vec3A,
     direction: Vec3A,
 }
 
-impl Ray3d {
-    /// Constructs a `Ray3d`, normalizing the direction vector.
+impl AdventureRay {
+    /// Constructs a `AdventureRay`, normalizing the direction vector.
     pub fn new(origin: Vec3, direction: Vec3) -> Self {
-        Ray3d {
+        AdventureRay {
             origin: origin.into(),
             direction: direction.normalize().into(),
         }
@@ -41,12 +41,13 @@ impl Ray3d {
         }
         camera
             .viewport_to_world(camera_transform, viewport_pos)
-            .map(Ray3d::from)
+            .ok()
+            .map(|r| AdventureRay::from(r))
     }
 }
 
-impl From<Ray> for Ray3d {
-    fn from(ray: Ray) -> Self {
-        Ray3d::new(ray.origin, Dir3::new(ray.direction).unwrap())
+impl From<Ray3d> for AdventureRay {
+    fn from(ray: Ray3d) -> Self {
+        AdventureRay::new(ray.origin, *ray.direction)
     }
 }

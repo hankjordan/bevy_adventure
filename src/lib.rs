@@ -88,3 +88,10 @@ pub mod prelude {
         WorldState,
     };
 }
+
+
+
+use bevy::prelude::*;
+
+#[derive(Component)] pub struct SceneRoot(pub Handle<Scene>);
+#[derive(Component)] pub struct SceneHooked;

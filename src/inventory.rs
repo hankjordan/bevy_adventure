@@ -2,8 +2,8 @@ use std::collections::HashMap;
 
 use bevy::{
     prelude::*,
-    utils::HashSet,
 };
+use std::collections::HashSet;
 
 use crate::textdisplay::{
     Message,
@@ -117,7 +117,7 @@ impl Recipes {
 
 #[allow(clippy::needless_pass_by_value)]
 fn handle_combine(
-    input: Res<Input<MouseButton>>,
+    input: Res<ButtonInput<MouseButton>>,
     mut display: TextDisplay,
     mut inventory: ResMut<Inventory>,
     recipes: Res<Recipes>,

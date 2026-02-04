@@ -3,6 +3,7 @@ use std::collections::HashMap;
 use bevy::{
     audio::AudioSource,
     ecs::system::SystemParam,
+    log::prelude::*,
     prelude::*,
 };
 
@@ -17,13 +18,13 @@ impl Plugin for AudioPlugin {
 }
 
 #[derive(Component)]
-struct AudioPlayer;
+struct AdventureAudioPlayer;
 
 #[allow(clippy::needless_pass_by_value)]
-fn cleanup_audio(mut commands: Commands, sinks: Query<(Entity, &AudioSink), With<AudioPlayer>>) {
+fn cleanup_audio(mut commands: Commands, sinks: Query<(Entity, &AudioSink), With<AdventureAudioPlayer>>) {
     for (entity, sink) in &sinks {
         if sink.empty() {
-            commands.window(entity).despawn();
+            commands.entity(entity).despawn();
         }
     }
 }
@@ -70,11 +71,8 @@ impl<'w, 's> AudioServer<'w, 's> {
         if let Some(source) = self.registry.get(name) {
             self.commands.spawn((
                 Name::from(name),
-                AudioBundle {
-                    source,
-                    ..default()
-                },
-                AudioPlayer,
+                AudioPlayer::new(source),
+                AdventureAudioPlayer,
             ));
         }
     }

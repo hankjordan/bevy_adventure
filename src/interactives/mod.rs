@@ -17,6 +17,7 @@ pub use interact::{
     prepare_interaction,
     reset_interaction,
     Interaction,
+    Interactives,
 };
 pub use plugin::InteractivesPlugin;
 pub use simple::{

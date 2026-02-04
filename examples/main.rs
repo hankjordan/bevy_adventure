@@ -11,15 +11,14 @@ use bevy_adventure::prelude::*;
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use bevy_rapier3d::prelude::*;
 
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, States)]
+#[derive(States, Clone, Copy, Default, Eq, PartialEq, Debug, Hash)]
 pub enum GameState {
-    MainMenu,
-
     #[default]
-    Bathroom,
-    Bedroom,
-    Hallway,
+    Main,
+    Lab,
 }
+
+impl bevy::state::state::FreelyMutableState for GameState {}
 
 // Bathroom |----------------------------------------------------------------------------------------------------------
 
@@ -321,7 +320,7 @@ fn setup_audio(mut server: AudioServer) {
         .load(SFX_DOOR_ENTER);
 }
 
-fn print_messages(mut messages: EventReader<NewMessage>) {
+fn print_messages(mut messages: MessageReader<NewMessage>, mut _ew: MessageWriter<NewMessage>) {
     for message in messages.read() {
         println!("Message: {:?}", message);
     }

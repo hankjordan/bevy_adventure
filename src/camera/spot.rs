@@ -46,7 +46,7 @@ impl CurrentSpot {
     /// # Panics
     /// If the Scene has not been set up yet, or there is no `MAIN_CAMERA` spot.
     pub fn name(&self) -> &str {
-        self.parent().name()
+        self.get().name()
     }
 
     /// Returns true if the `CurrentSpot` is set.
@@ -81,12 +81,12 @@ impl CameraSpot {
 
     /// Returns the entity associated with the `CameraSpot`.
     pub fn entity(&self) -> Entity {
-        self.window
+        self.entity
     }
 
     /// Sets the entity of the `CameraSpot`.
     pub fn set_entity(&mut self, entity: Entity) {
-        self.window = entity;
+        self.entity = entity;
     }
 
     /// Returns the transform of the `CameraSpot`.

@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use bevy_rapier3d::prelude::*;
 
 use crate::{
-    interactives::ray::Ray3d,
+    interactives::ray::AdventureRay,
     CameraSpots,
     CommandsExt,
     CurrentSpot,
@@ -37,35 +37,33 @@ pub struct Hovering {
 pub fn hovering_raycast(
     commands: CommandsExt,
     spots: CameraSpots,
-
-    ctx: Res<RapierContext>,
+    ctx: ReadRapierContext,
     cursor: Res<Cursor>,
     at_spot: Res<CurrentSpot>,
-
     mut hovering: ResMut<Hovering>,
-
     windows: Query<&Window>,
     cameras: Query<(&Camera, &GlobalTransform)>,
     ignore: Query<&Ignores>,
 ) {
     if let Ok(window) = windows.single() {
         if let Ok((camera, gtf)) = cameras.single() {
-            let ray = Ray3d::from_screenspace(cursor.position(), camera, gtf, window).unwrap();
+            let ray = AdventureRay::from_screenspace(cursor.position(), camera, gtf, window).unwrap();
 
             let mut ignores = Vec::new();
 
-            if let Ok(ignored) = ignore.get(at_spot.parent().window()) {
+            if let Ok(ignored) = ignore.get(at_spot.get().entity()) {
                 ignores.extend(commands.named_any(&ignored.names));
             }
 
-            if let Some(looking_at) = spots.for_spot(at_spot.parent()) {
+            if let Some(looking_at) = spots.for_spot(at_spot.get()) {
                 if let Ok(ignored) = ignore.get(looking_at) {
                     ignores.extend(commands.named_any(&ignored.names));
                 }
             }
 
-            hovering.window = None;
+            hovering.entity = None;
 
+            /*
             if let Some((entity, _)) = ctx.cast_ray(
                 ray.origin(),
                 ray.direction(),
@@ -73,8 +71,9 @@ pub fn hovering_raycast(
                 true,
                 QueryFilter::new().predicate(&|entity| !ignores.contains(&entity)),
             ) {
-                hovering.window = Some(entity);
+                hovering.entity = Some(entity);
             }
+            */
         }
     }
 }

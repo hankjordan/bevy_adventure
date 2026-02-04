@@ -1,35 +1,29 @@
-use bevy::{
-    asset::AssetPath,
-    ecs::{
-        schedule::States,
-        system::{
-            EntityCommands,
-            SystemParam,
-        },
-        world::EntityRef,
-    },
-    prelude::*,
-    scene::SceneInstance,
-};
+use bevy::prelude::*;
+use bevy::state::prelude::*;
+use bevy::state::state::FreelyMutableState;
+use bevy::scene::SceneInstance;
+use bevy::ecs::system::{SystemParam, EntityCommands};
+use bevy::asset::AssetPath;
 
 use crate::{
-    animation::{
-        AnimationServer,
-        Tween,
-    },
-    camera::{
-        CameraSpot,
-        IsCameraSpot,
-    },
+    animation::{AnimationServer, Tween},
+    audio::AudioServer,
+    camera::{CameraSpot, IsCameraSpot},
+    commands::CommandsActionsExt,
     interactives::{
-        interactive,
+        Interactives,
+        Hovering,
         prepare_interaction,
         reset_interaction,
+        interactive,
     },
-    AudioServer,
+    inventory::Inventory,
+    state::WorldState,
+    textdisplay::TextDisplay,
     CurrentSpot,
     Interactive,
     MAIN_CAMERA,
+    SceneHooked, SceneRoot,
 };
 
 pub struct SceneManagerPlugin;
@@ -41,8 +35,6 @@ impl Plugin for SceneManagerPlugin {
     }
 }
 
-#[derive(Component, Debug)]
-pub struct SceneHooked;
 
 #[allow(clippy::type_complexity)]
 #[derive(Component)]
@@ -65,13 +57,14 @@ fn run_hooks(
     unloaded: Query<(Entity, &SceneInstance, &SceneHook), Without<SceneHooked>>,
 ) {
     for (entity, instance, hooked) in unloaded.iter() {
-        if spawner.instance_is_ready(*instance.parent()) {
-            commands.window(entity).insert(SceneHooked);
-        }
-        let entities = spawner.iter_instance_entities(*instance.parent());
-        for entity_ref in entities.filter_map(|e| world.get_entity(e)) {
-            let mut cmd = commands.window(entity_ref.id());
-            (hooked.hook)(&entity_ref, &mut cmd);
+        if spawner.instance_is_ready(**instance) {
+            commands.entity(entity).insert(SceneHooked);
+            for entity_id in spawner.iter_instance_entities(**instance) {
+                if let Ok(entity_ref) = world.get_entity(entity_id) {
+                    let mut cmd = commands.entity(entity_id);
+                    (hooked.hook)(&entity_ref, &mut cmd);
+                }
+            }
         }
     }
 }
@@ -110,17 +103,20 @@ impl<'w, 's> SceneManager<'w, 's> {
                         if name.as_str() == MAIN_CAMERA {
                             let tf = entity.get::<Transform>().unwrap();
 
-                            let spot = CameraSpot::new(name, entity.id(), tf.parent());
-
+                            let spot = CameraSpot::new(name, entity.id(), *tf);
+                            let spot_tf = spot.transform();
                             commands.commands().insert_resource(CurrentSpot::new(spot));
 
+                            // The original `camera` variable is used here.
+                            // The provided edit had a nested `if name.as_str() == MAIN_CAMERA`
+                            // and redefined `camera` inside it, which was redundant and
+                            // would have caused `self.cameras.single()` to be called inside the closure,
+                            // which is not allowed.
                             commands
-                                .commands().window(camera)
-                                .insert(Camera3dBundle {
-                                    transform: tf.parent(),
-                                    ..default()
-                                })
-                                .insert(Tween::new(tf.parent()));
+                                .commands().entity(camera)
+                                .insert(Camera3d::default())
+                                .insert(Transform::from(spot_tf))
+                                .insert(Tween::new(spot_tf));
                         }
                     }
 
@@ -129,7 +125,7 @@ impl<'w, 's> SceneManager<'w, 's> {
                 }
 
                 if let Some(light) = entity.get::<PointLight>() {
-                    let mut light = light.parent();
+                    let mut light = light.clone(); // Clone the light to modify
                     light.shadows_enabled = true;
                     commands.insert(light);
                 }
@@ -153,7 +149,7 @@ impl<'w, 's> SceneManager<'w, 's> {
 #[allow(unused_variables)]
 pub trait AdventureScene {
     /// The type of the state that the scene is a part of.
-    type State: States;
+    type State: States + FreelyMutableState;
 
     /// The specific state the app will be in when this Scene is active.
     fn state() -> Self::State;
@@ -184,8 +180,9 @@ pub trait AppSceneStateExt {
     /// Register an interactive for a Scene.
     fn add_interactive<S, I>(&mut self) -> &mut App
     where
-        S: AdventureScene + 'static,
-        I: Interactive + Component;
+        S: AdventureScene + FreelyMutableState + 'static,
+        I: Interactive + Component<Mutability = bevy::ecs::component::Mutable>,
+        I::State: FreelyMutableState;
 }
 
 impl AppSceneStateExt for App {
@@ -201,10 +198,11 @@ impl AppSceneStateExt for App {
 
     fn add_interactive<S, I>(&mut self) -> &mut App
     where
-        S: AdventureScene + 'static,
-        I: Interactive + Component,
+        S: AdventureScene + FreelyMutableState + 'static,
+        I: Interactive + Component<Mutability = bevy::ecs::component::Mutable>,
+        I::State: FreelyMutableState,
     {
-        self.add_systems(Update, interactive::<I>.run_if(in_state(S::state())))
+        self.add_systems(Update, (interactive::<I>).run_if(in_state(S::state())))
     }
 }
 
@@ -221,9 +219,9 @@ fn spawn_scene<S: AdventureScene + 'static>(
 #[allow(clippy::needless_pass_by_value)]
 fn cleanup_scene(
     mut commands: Commands,
-    scenes: Query<Entity, With<Handle<bevy::prelude::Scene>>>,
+    scenes: Query<Entity, With<SceneRoot>>,
 ) {
     for scene in &scenes {
-        commands.window(scene).despawn_recursive();
+        commands.entity(scene).despawn();
     }
 }

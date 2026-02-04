@@ -1,13 +1,6 @@
-use bevy::{
-    ecs::{
-        schedule::States,
-        system::{
-            EntityCommands,
-            SystemParam,
-        },
-    },
-    prelude::*,
-};
+use bevy::prelude::*;
+use bevy::state::prelude::States;
+use bevy::ecs::system::{SystemParam, EntityCommands};
 
 use crate::{
     Action,
@@ -35,7 +28,7 @@ impl<'w, 's> CommandsExt<'w, 's> {
 
         for (entity, name) in &self.query {
             if name.as_str() == target {
-                result.queue(entity);
+                result.push(entity);
             }
         }
 
@@ -49,7 +42,7 @@ impl<'w, 's> CommandsExt<'w, 's> {
         'outer: for (entity, name) in &self.query {
             for target in targets {
                 if name.as_str() == target.as_ref() {
-                    result.queue(entity);
+                    result.push(entity);
                     continue 'outer;
                 }
             }
@@ -61,14 +54,14 @@ impl<'w, 's> CommandsExt<'w, 's> {
     /// Despawn all entities with the given name.
     pub fn despawn_named(&mut self, target: &str) {
         for entity in self.named(target) {
-            self.commands.window(entity).despawn_recursive();
+            self.commands.entity(entity).despawn();
         }
     }
 
     /// Despawn all entities with any of the given names.
     pub fn despawn_all_named(&mut self, targets: &Vec<&str>) {
         for entity in self.named_any(targets) {
-            self.commands.window(entity).despawn_recursive();
+            self.commands.entity(entity).despawn();
         }
     }
 
@@ -76,7 +69,7 @@ impl<'w, 's> CommandsExt<'w, 's> {
     pub fn show_named(&mut self, target: &str) {
         for entity in self.named(target) {
             if let Ok(mut visibility) = self.visibility.get_mut(entity) {
-                visibility.parent() = Visibility::Visible;
+                *visibility = Visibility::Visible;
             }
         }
     }
@@ -85,7 +78,7 @@ impl<'w, 's> CommandsExt<'w, 's> {
     pub fn hide_named(&mut self, target: &str) {
         for entity in self.named(target) {
             if let Ok(mut visibility) = self.visibility.get_mut(entity) {
-                visibility.parent() = Visibility::Hidden;
+                *visibility = Visibility::Hidden;
             }
         }
     }
@@ -121,7 +114,7 @@ pub trait CommandsActionsExt {
     fn actions<State: States>(&mut self, actions: Vec<Action<State>>) -> &mut Self;
 }
 
-impl<'w, 's, 'a> CommandsActionsExt for EntityCommands<'w, 's, 'a> {
+impl CommandsActionsExt for EntityCommands<'_> {
     fn actions<State: States>(&mut self, actions: Vec<Action<State>>) -> &mut Self {
         self.insert(Simple::from(actions))
     }
