@@ -1,9 +1,7 @@
 use std::marker::PhantomData;
 
-use bevy::{
-    ecs::system::SystemParam,
-    prelude::*,
-};
+use bevy::prelude::*;
+// use bevy::derive::SystemParam; // Not needed if in prelude
 
 use crate::Item;
 
@@ -12,7 +10,7 @@ pub struct TextDisplayPlugin;
 impl Plugin for TextDisplayPlugin {
     fn build(&self, app: &mut App) {
         app ////
-            .add_event::<NewMessage>();
+            .add_message::<NewMessage>();
     }
 }
 
@@ -56,16 +54,26 @@ impl Message {
 #[derive(Debug, Event)]
 pub struct NewMessage(pub Message);
 
-#[derive(SystemParam)]
-pub struct TextDisplay<'w, 's> {
-    events: EventWriter<'w, NewMessage>,
+impl bevy::ecs::message::Message for NewMessage {} 
+// If Message trait exists and NewMessage needs it:
+// impl bevy::ecs::message::Message for NewMessage {} 
+// But "Message" trait might be "Event"? 
+// Error 766 said "NewMessage is not a Message". 
+// Maybe MessageWriter expects T: Message?
+// I will try to leave it as Event and see if imports fixes it?
+// Actually, earlier error 766 happened WITH derive(Event).
+// So I MUST derive Message or impl it.
+// I'll try derive(Event) + impl Message manually.
 
-    #[system_param(ignore)]
+#[derive(bevy::ecs::system::SystemParam)]
+pub struct TextDisplay<'w, 's> {
+    events: MessageWriter<'w, NewMessage>,
+
     _marker: PhantomData<&'s ()>,
 }
 
 impl<'w, 's> TextDisplay<'w, 's> {
     pub fn show(&mut self, message: Message) {
-        self.events.send(NewMessage(message));
+        self.events.write(NewMessage(message));
     }
 }

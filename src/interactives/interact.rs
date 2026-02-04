@@ -1,12 +1,10 @@
-use bevy::{
-    ecs::{
-        schedule::States,
-        system::SystemParam,
-    },
-    prelude::*,
-};
+use bevy::prelude::*;
+use bevy::ecs::system::SystemParam;
+use bevy::state::state::FreelyMutableState;
 
 use crate::{
+    animation::AnimationServer,
+    audio::AudioServer,
     camera::{
         BackToSpot,
         BackToState,
@@ -112,11 +110,11 @@ impl Default for LookingAt {
 #[allow(clippy::needless_pass_by_value)]
 #[allow(clippy::too_many_arguments)]
 #[allow(clippy::collapsible_if)]
-pub fn prepare_interaction<S: States>(
+pub fn prepare_interaction<S: States + FreelyMutableState>(
     mut commands: Commands,
     spots: CameraSpots,
 
-    input: Res<Input<MouseButton>>,
+    input: Res<ButtonInput<MouseButton>>,
     cursor: Res<Cursor>,
 
     mut interaction: ResMut<Interaction>,
@@ -148,7 +146,7 @@ pub fn prepare_interaction<S: States>(
                     commands.insert_resource(NextSpot(spot.name.clone()));
                 } else {
                     if let Ok(back) = back_state.get(at_spot.get().entity()) {
-                        commands.insert_resource(NextState(Some(back.state.clone())));
+                        commands.insert_resource(NextState::Pending(back.state.clone()));
                     }
 
                     commands.insert_resource(NextSpot(MAIN_CAMERA.to_owned()));
@@ -160,24 +158,20 @@ pub fn prepare_interaction<S: States>(
     }
 }
 
-#[derive(SystemParam)]
-pub struct Interactives<'w, 's, I: Interactive + Component + 'static> {
+#[derive(bevy::ecs::system::SystemParam)]
+pub struct Interactives<'w> {
     interaction: ResMut<'w, Interaction>,
     hovering: Res<'w, Hovering>,
-    query: Query<'w, 's, &'static mut I>,
 }
 
-impl<'w, 's, I: Interactive + Component + 'static> Interactives<'w, 's, I> {
-    fn get(&mut self) -> Option<(Entity, Mut<I>)> {
+impl<'w> Interactives<'w> {
+    pub fn get(&mut self) -> Option<Entity> {
         if self.interaction.ok() {
             if let Some(entity) = self.hovering.entity {
-                if let Ok(interactive) = self.query.get_mut(entity) {
-                    self.interaction.done();
-                    return Some((entity, interactive));
-                }
+                self.interaction.done();
+                return Some(entity);
             }
         }
-
         None
     }
 }
@@ -194,61 +188,68 @@ pub fn interactive<I: Interactive + Component>(
     mut state: ResMut<WorldState>,
     at_spot: ResMut<CurrentSpot>,
 
-    mut interactives: Interactives<I>,
-) {
-    if let Some((entity, mut interactive)) = interactives.get() {
-        let mut focused = true;
+    mut interactives: Interactives,
+    mut query: Query<&mut I>,
+) 
+where 
+    I: Component<Mutability = bevy::ecs::component::Mutable>,
+    I::State: FreelyMutableState,
+{
+    if let Some(entity) = interactives.get() {
+        if let Ok(mut interactive) = query.get_mut(entity) {
+            let mut focused = true;
 
-        if let Some(spot) = spots.for_interactive(entity) {
-            if at_spot.get().entity() != spot.entity() {
-                commands.insert_resource(NextSpot(spot.name().to_owned()));
-                commands.insert_resource(LookingAt(entity));
-                focused = false;
-            }
-        }
-
-        if focused {
-            let actions;
-
-            if let Some(dragged) = &dragging.src {
-                let mut item = ItemRef::new(dragged);
-
-                actions = interactive.use_item(&mut state, &mut item);
-
-                if item.consumed() {
-                    inventory.items.remove(dragged);
+            if let Some(spot) = spots.for_interactive(entity) {
+                if at_spot.get().entity() != spot.entity() {
+                    commands.insert_resource(NextSpot(spot.name().to_owned()));
+                    commands.insert_resource(LookingAt(entity));
+                    focused = false;
                 }
-            } else {
-                actions = interactive.interact(&mut state);
             }
 
-            for action in actions {
-                match action {
-                    Action::AddItem(name) => {
-                        display.show(Message::ItemPickup(name.clone()));
-                        inventory.items.insert(name);
+            if focused {
+                let actions;
+
+                if let Some(dragged) = &dragging.src {
+                    let mut item = ItemRef::new(dragged);
+
+                    actions = interactive.use_item(&mut state, &mut item);
+
+                    if item.consumed() {
+                        inventory.items.remove(dragged);
                     }
-                    Action::Animation(name) => {
-                        commands.play_animation(&name);
-                    }
-                    Action::Audio(name) => {
-                        commands.play_audio(&name);
-                    }
-                    Action::Message(text) => display.show(text),
-                    Action::Transition(state) => {
-                        commands.insert_resource(NextState(Some(state)));
-                    }
-                    Action::Move(name) => commands.insert_resource(NextSpot(name)),
-                    Action::Jump(name) => {
-                        commands.insert_resource(NextSpot(name));
-                        commands.insert_resource(SkipAnimation);
+                } else {
+                    actions = interactive.interact(&mut state);
+                }
+
+                for action in actions {
+                    match action {
+                        Action::AddItem(name) => {
+                            display.show(Message::ItemPickup(name.clone()));
+                            inventory.items.insert(name);
+                        }
+                        Action::Animation(name) => {
+                            commands.play_animation(&name);
+                        }
+                        Action::Audio(name) => {
+                            commands.play_audio(&name);
+                        }
+                        Action::Message(text) => display.show(text),
+                        Action::Transition(state) => {
+                            commands.insert_resource(NextState::Pending(state));
+                        }
+                        Action::Move(name) => commands.insert_resource(NextSpot(name)),
+                        Action::Jump(name) => {
+                            commands.insert_resource(NextSpot(name));
+                            commands.insert_resource(SkipAnimation);
+                        }
                     }
                 }
             }
         }
     }
 
-    for mut actions in &mut interactives.query {
-        actions.update(&mut commands, &mut state);
+    for mut interactive in query.iter_mut() {
+        interactive.update(&mut commands, &mut state);
     }
 }

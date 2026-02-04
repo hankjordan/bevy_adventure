@@ -1,9 +1,8 @@
 use std::marker::PhantomData;
 
-use bevy::{
-    ecs::schedule::States,
-    prelude::*,
-};
+use bevy::prelude::*;
+use bevy::state::prelude::*;
+use bevy::state::state::FreelyMutableState;
 
 use crate::{
     animation::AnimationPlugin,
@@ -31,7 +30,7 @@ impl<S> Default for AdventurePlugin<S> {
 
 impl<S> Plugin for AdventurePlugin<S>
 where
-    S: States,
+    S: States + FreelyMutableState,
 {
     fn build(&self, app: &mut App) {
         app ////

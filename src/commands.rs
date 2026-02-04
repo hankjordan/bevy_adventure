@@ -1,13 +1,6 @@
-use bevy::{
-    ecs::{
-        schedule::States,
-        system::{
-            EntityCommands,
-            SystemParam,
-        },
-    },
-    prelude::*,
-};
+use bevy::prelude::*;
+use bevy::state::prelude::States;
+use bevy::ecs::system::{SystemParam, EntityCommands};
 
 use crate::{
     Action,
@@ -61,14 +54,14 @@ impl<'w, 's> CommandsExt<'w, 's> {
     /// Despawn all entities with the given name.
     pub fn despawn_named(&mut self, target: &str) {
         for entity in self.named(target) {
-            self.commands.entity(entity).despawn_recursive();
+            self.commands.entity(entity).despawn();
         }
     }
 
     /// Despawn all entities with any of the given names.
     pub fn despawn_all_named(&mut self, targets: &Vec<&str>) {
         for entity in self.named_any(targets) {
-            self.commands.entity(entity).despawn_recursive();
+            self.commands.entity(entity).despawn();
         }
     }
 
@@ -121,7 +114,7 @@ pub trait CommandsActionsExt {
     fn actions<State: States>(&mut self, actions: Vec<Action<State>>) -> &mut Self;
 }
 
-impl<'w, 's, 'a> CommandsActionsExt for EntityCommands<'w, 's, 'a> {
+impl CommandsActionsExt for EntityCommands<'_> {
     fn actions<State: States>(&mut self, actions: Vec<Action<State>>) -> &mut Self {
         self.insert(Simple::from(actions))
     }

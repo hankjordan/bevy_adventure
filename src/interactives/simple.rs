@@ -1,5 +1,5 @@
 use bevy::{
-    ecs::schedule::States,
+    state::prelude::States,
     prelude::*,
 };
 
@@ -43,21 +43,21 @@ impl<State> Simple<State> {
     /// Add an `Action::Animation` action to the `Simple`.
     #[must_use]
     pub fn animation(mut self, name: &str) -> Self {
-        self.push(Action::Animation(name.to_owned()));
+        self.actions.push(Action::Animation(name.to_owned()));
         self
     }
 
     /// Add an `Action::Audio` action to the `Simple`.
     #[must_use]
     pub fn audio(mut self, name: &str) -> Self {
-        self.push(Action::Audio(name.to_owned()));
+        self.actions.push(Action::Audio(name.to_owned()));
         self
     }
 
     /// Add an `Action::Jump` action to the `Simple`.
     #[must_use]
     pub fn jump(mut self, name: &str) -> Self {
-        self.push(Action::Jump(name.to_owned()));
+        self.actions.push(Action::Jump(name.to_owned()));
         self
     }
 }

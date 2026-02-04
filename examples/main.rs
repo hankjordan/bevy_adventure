@@ -1,5 +1,3 @@
-#![allow(clippy::uninlined_format_args)]
-
 use bevy::{
     ecs::{
         system::EntityCommands,
@@ -7,19 +5,29 @@ use bevy::{
     },
     prelude::*,
 };
-use bevy_adventure::prelude::*;
+use bevy_adventure::{
+    prelude::*,
+    textdisplay::Message as TextMessage,
+    interactives::InteractivesPlugin,
+};
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use bevy_rapier3d::prelude::*;
 
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, States)]
+#[derive(States, Clone, Copy, Default, Eq, PartialEq, Debug, Hash)]
 pub enum GameState {
-    MainMenu,
-
     #[default]
+    Main,
+    Lab,
     Bathroom,
-    Bedroom,
     Hallway,
+    Bedroom,
 }
+
+// impl bevy::state::state::FreelyMutableState for GameState {} // This might be conflicting with derive(States)? 
+// Error said: "conflicting implementations of trait FreelyMutableState for type GameState"
+// "note: this error originates in the derive macro States"
+// So YES, Bevy 0.18 derive(States) likely implements FreelyMutableState.
+// I will comment this manual impl out.
 
 // Bathroom |----------------------------------------------------------------------------------------------------------
 
@@ -30,7 +38,7 @@ impl Interactive for Cup {
     type State = GameState;
 
     fn interact(&mut self, _state: &mut ResMut<WorldState>) -> Vec<Action<Self::State>> {
-        Action::Message(Message::new("It's a cup.")).single()
+        Action::Message(TextMessage::new("It's a cup.")).single()
     }
 }
 
@@ -159,7 +167,7 @@ impl Interactive for TrashCan {
 
     fn interact(&mut self, state: &mut ResMut<WorldState>) -> Vec<Action<Self::State>> {
         if state.get_bool(TRASH_CAN_EMPTY) {
-            Action::Message(Message::new("The trash can is empty.")).single()
+            Action::Message(TextMessage::new("The trash can is empty.")).single()
         } else {
             state.set(TRASH_CAN_EMPTY, true);
 
@@ -321,27 +329,31 @@ fn setup_audio(mut server: AudioServer) {
         .load(SFX_DOOR_ENTER);
 }
 
-fn print_messages(mut messages: EventReader<NewMessage>) {
+fn print_messages(mut messages: MessageReader<NewMessage>, mut _ew: MessageWriter<NewMessage>) {
     for message in messages.read() {
         println!("Message: {:?}", message);
     }
 }
 
+// ... imports were weirdly inserted inside main function in previous patch.
+// Fixing that by just rewriting main.
+
 fn main() {
     App::new()
-        ////
         .add_plugins((
-            DefaultPlugins.build().set(AssetPlugin {
-                file_path: "examples/assets".to_owned(),
+            DefaultPlugins.set(AssetPlugin {
+                // Wasm builds will check for meta files (which we don't strictly need) if this isn't set.
+                // This becomes spammy in the console.
+                meta_check: bevy::asset::AssetMetaCheck::Never,
                 ..default()
             }),
+            InteractivesPlugin::<GameState>::default(),
             RapierPhysicsPlugin::<NoUserData>::default(),
             RapierDebugRenderPlugin::default(),
-            WorldInspectorPlugin::new(),
             AdventurePlugin::<GameState>::default(),
+            WorldInspectorPlugin::new(),
         ))
-        ////
-        .add_state::<GameState>()
+        .init_state::<GameState>()
         ////
         .add_scene::<BathroomScene>()
         .add_scene::<BedroomScene>()

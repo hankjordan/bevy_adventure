@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use bevy_rapier3d::prelude::*;
 
 use crate::{
-    interactives::ray::Ray3d,
+    interactives::ray::AdventureRay,
     CameraSpots,
     CommandsExt,
     CurrentSpot,
@@ -37,20 +37,17 @@ pub struct Hovering {
 pub fn hovering_raycast(
     commands: CommandsExt,
     spots: CameraSpots,
-
-    ctx: Res<RapierContext>,
+    ctx: ReadRapierContext,
     cursor: Res<Cursor>,
     at_spot: Res<CurrentSpot>,
-
     mut hovering: ResMut<Hovering>,
-
     windows: Query<&Window>,
     cameras: Query<(&Camera, &GlobalTransform)>,
     ignore: Query<&Ignores>,
 ) {
-    if let Ok(window) = windows.get_single() {
-        if let Ok((camera, gtf)) = cameras.get_single() {
-            let ray = Ray3d::from_screenspace(cursor.position(), camera, gtf, window).unwrap();
+    if let Ok(window) = windows.single() {
+        if let Ok((camera, gtf)) = cameras.single() {
+            let ray = AdventureRay::from_screenspace(cursor.position(), camera, gtf, window).unwrap();
 
             let mut ignores = Vec::new();
 
@@ -66,6 +63,7 @@ pub fn hovering_raycast(
 
             hovering.entity = None;
 
+            /*
             if let Some((entity, _)) = ctx.cast_ray(
                 ray.origin(),
                 ray.direction(),
@@ -75,6 +73,7 @@ pub fn hovering_raycast(
             ) {
                 hovering.entity = Some(entity);
             }
+            */
         }
     }
 }

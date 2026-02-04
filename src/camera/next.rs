@@ -1,5 +1,6 @@
 use bevy::{
-    ecs::system::SystemState,
+    ecs::system::{SystemParam, SystemState},
+    log::prelude::*,
     prelude::*,
 };
 
@@ -57,8 +58,9 @@ fn handle_next_spot(world: &mut World) {
         let (spots, mut cameras) = state.get_mut(world);
 
         if let Some(spot) = spots.get(&next.0) {
-            if let Ok((mut tf, mut animation)) = cameras.get_single_mut() {
-                if skip {
+            // Bevy 0.18: single_mut returns (Mut<T>, ...)
+            if let Some((mut tf, mut animation)) = cameras.iter_mut().next() {
+                 if skip {
                     *tf = spot.transform();
                 }
 
@@ -66,8 +68,8 @@ fn handle_next_spot(world: &mut World) {
                 world.insert_resource(CurrentSpot::new(spot));
             }
         } else {
-            for entity in world.iter_entities().map(|e| e.id()) {
-                info!("Entity {:?}", world.inspect_entity(entity));
+            for entity in world.query::<Entity>().iter(&world) {
+                info!("Entity {:?}", entity);
             }
 
             warn!("Could not find CameraSpot with name {:?}", next.0);
